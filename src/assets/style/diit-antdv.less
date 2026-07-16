@@ -1,0 +1,550 @@
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ant-tree li .ant-tree-node-content-wrapper {
+  color: var(--titleColor) !important;
+  font-size: var(--fontSize-content);
+}
+
+.ant-tree li {
+  color: var(--titleColor);
+  padding-bottom: 0.10rem;
+}
+
+.toolItem .ant-btn {
+  padding-left: 0.10rem;
+  padding-right: 0.10rem;
+  background: var(--bgColor);
+  color: var(--iconColor);
+  font-family: var(--fontFamily);
+  border: 0;
+  font-size: var(--fontSize-content);
+  height: 0.40rem;
+  text-shadow: none;
+  box-shadow: none;
+  //display: flex;
+  //align-items: center;
+}
+
+.toolItem .ant-btn:hover {
+  color: var(--iconHoverColor);
+}
+
+.ant-dropdown .toolItem .ant-btn {
+  padding-left: 0;
+  padding-right: 0;
+  height: auto;
+}
+
+/***工具条图标***/
+.toolIcon {
+  font-Size: var(--fontSize-icon) !important;
+  color: var(--iconColor);
+}
+
+.toolItem .ant-btn:hover .toolIcon {
+  color: var(--iconHoverColor);
+}
+
+.ant-dropdown-menu-item:hover .toolIcon, .ant-dropdown-menu-item:hover {
+  color: var(--iconHoverColor);
+}
+
+.diit-widget-btn .anticon-down svg {
+  height: 0.08rem;
+}
+
+.tool-bar-item {
+  position: relative;
+}
+
+.toolbarclasshorizontal .tool-bar-item:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  border-right: 0.01rem solid rgba(82, 184, 255, 0.3);
+  height: 0.026rem;
+  width: 0.02rem;
+  top: 0.08rem;
+}
+
+.toolbarclassVertical .tool-bar-item:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  border-top: 0.01rem solid rgba(82, 184, 255, 0.3);
+  height: 0.02rem;
+  width: 0.26rem;
+  left: 0.10rem;
+}
+
+.tool-bar-item:last-child:after {
+  border-right: 0;
+}
+
+.toolbarclassVertical > .tool-bar-item:last-child:after {
+  border-top: 0;
+}
+
+.ant-tooltip-inner {
+  // background: linear-gradient(338deg,rgba(0,98,179,0.56) 2%, rgba(9,74,135,0.00) 85%), radial-gradient(rgba(57,181,255,0.50), rgba(17,174,255,0.00));
+  border: 1px solid;
+  border-image: linear-gradient(0deg, rgba(78,170,255,0.47) 0%, #6fbdff 100%, #6fbdff 100%) 1 1;
+  border-radius: 4px;
+  box-shadow: 0px 2px 4px 0px rgba(0,77,141,0.27), 0px 0px 30px 0px #0b538f inset;
+  // background: linear-gradient(141deg, var(--bgColor) -17%, var(--bgColor) 98%);
+  // color: var(--fontColor);
+  // border: 0.01rem solid var(--bdColor);
+  // border-radius: 4px;
+  // min-width: 0.90rem;
+  // text-align: center;
+  // border: none;
+}
+.ant-tooltip-arrow::before {
+  // background-color: #fff;
+  content: none;
+}
+
+.ant-tree li span.ant-tree-checkbox {
+  height: 0.16rem;
+}
+
+.ant-tree-checkbox-inner {
+  width: 0.12rem;
+  height: 0.12rem;
+}
+
+.ant-drawer-content-wrapper {
+  width: 3.00rem;
+  margin: 0.70rem 0.25rem !important;
+  height: auto !important;
+}
+
+.diit-widget-drawer .ant-drawer-content {
+  border-radius: 0;
+}
+
+.esriSimpleSliderTL {
+  display: none !important;
+}
+
+.ol-zoom,
+.ol-attribution {
+  display: none;
+}
+
+.diit-widget-downmenu .ant-dropdown-menu {
+  background-color: var(--bgColor) !important;
+  color: var(--fontColor) !important;
+}
+
+.diit-widget-downmenu .ant-dropdown-menu-item-active {
+  background-color: var(--bgHoverColor) !important;
+}
+
+.diit-widget-downmenu .ant-dropdown-menu-item,
+.diit-widget-downmenu .ant-dropdown-menu-submenu-title {
+  color: var(--fontColor) !important;
+}
+
+.diit-widget-downmenu .ant-dropdown-menu-item:hover,
+.diit-widget-downmenu .ant-dropdown-menu-submenu-title:hover {
+  background-color: var(--bgHoverColor) !important;
+}
+
+.ant-modal-content {
+  background: var(--bgColor) !important;
+}
+
+.ant-modal-header {
+  /* background: var(--bgColor);*/
+  // border-bottom: 0.01rem dashed var(--bdColor);
+  border-bottom: 0rem dashed var(--bdColor) !important;
+}
+
+.ant-modal-header .ant-modal-title {
+  color: var(--fontColor);
+}
+
+.ant-modal-content .ant-modal-close {
+  color: var(--fontColor) !important;
+}
+
+.toolbar-box {
+  background: var(--bgColor);
+}
+
+.diit-widget-btn .ant-btn {
+  background: transparent;
+  color: var(--fontColorGray);
+}
+
+.ant-btn.active, .ant-btn:active {
+  background: transparent;
+  border-color: transparent;
+  outline: none;
+}
+
+.ant-btn {
+  outline: none;
+}
+
+/**表格修改**/
+.diit-mapWidget-tbl .ant-table-thead > tr > th {
+  color: var(--fontColor);
+  text-align: center;
+  font-weight: bold;
+}
+
+.diit-widget-tbl .ant-table-thead > tr > th,
+.diit-widget-tbl .ant-table-tbody > tr > td {
+  padding: 0.10rem;
+  overflow-wrap: break-word;
+  color: var(--fontColor);
+}
+
+.diit-widget-tbl,
+.ant-table-fixed-header,
+> .ant-table-content,
+> .ant-table-scroll,
+> .ant-table-body {
+  background: transparent;
+}
+
+.diit-widget-tbl .ant-table-content .ant-table-scroll .ant-table-header {
+  background: transparent;
+}
+
+.diit-widget-tbl .ant-table-bordered .ant-table-thead > tr > th,
+.diit-widget-tbl .ant-table-bordered .ant-table-tbody > tr > td {
+  background: transparent;
+}
+
+// .diit-widget-tbl
+//   .ant-table-thead
+//   > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)
+//   > td,
+// .diit-widget-tbl
+//   .ant-table-tbody
+//   > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)
+//   > td,
+// .diit-widget-tbl
+//   .ant-table-thead
+//   > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)
+//   > td,
+// .diit-widget-tbl
+//   .ant-table-tbody
+//   > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)
+//   > td {
+//   background: var(--bgColor);
+// }
+
+.diit-widget-tbl .ant-table-bordered .ant-table-thead > tr > th,
+.diit-widget-tbl .ant-table-bordered .ant-table-tbody > tr > td {
+  border-right: 0.01rem solid var(--bdColor);
+}
+
+.diit-widget-tbl .ant-table-thead > tr > th {
+  background: var(--bgColor);
+}
+
+/*修改滚动条样式*/
+::-webkit-scrollbar {
+  width: 0.06rem;
+  height: 0.06rem;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 0.10rem;
+  box-shadow: var(--scrollBarShadow);
+  background: var(--scrollBarThumbBgColor);
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: var(--scrollBarShadow);
+  border-radius: 0;
+  background: var(--scrollTrackColor);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/***弹出框****/
+.ant-popover {
+  font-size: 0.14rem;
+  --popover-font-color: #fff;
+  .ant-popover-arrow {
+    display: none;
+  }
+  .ant-popover-inner {
+    // height: 2rem;
+    // background: linear-gradient(338deg,rgba(0,98,179,0.56) 2%, rgba(9,74,135,0.00) 85%), radial-gradient(rgba(57,181,255,0.50), rgba(17,174,255,0.00));
+    background: rgba(0,98,179,0.7) ;
+    border: 1px solid #6fbdff;
+    border-radius: 4px;
+    .ant-popover-title {
+      border: none;
+      color: var(--popover-font-color)
+    }
+    .ant-popover-inner-content,
+    .ant-radio-wrapper {
+      color: var(--popover-font-color)
+    }
+  }
+}
+
+.dialogWrap {
+  left: 50%;
+  bottom: auto;
+  right: auto;
+  top: 1.50rem;
+  overflow: hidden;
+}
+
+.dialog {
+  .ant-modal-header {
+    padding-left: 0.40rem;
+    margin-left: 0.10rem;
+    margin-right: 0.10rem;
+
+    .ant-modal-title {
+      color: var(--fontColor);
+    }
+  }
+
+  .anticon-close {
+    color: var(--fontColor);
+  }
+
+  .ant-modal-content {
+    box-shadow: none;
+  }
+
+  .ant-modal-footer {
+    border: 0;
+
+    div {
+      text-align: center;
+
+      button {
+        border-radius: 0.04rem;
+        width: 1.20rem;
+        height: 0.40rem;
+        font-size: 0.16rem;
+        margin-right: 0.20rem;
+
+        &:first-child {
+          background: transparent;
+          border: 0.01rem solid var(--bdColor);
+          color: var(--fontColor);
+        }
+
+        &:last-child {
+          background: var(--bdColor);
+          border: 0.01rem solid var(--bdColor);
+          color: var(--fontColor);
+        }
+      }
+    }
+  }
+
+  .anticon-close {
+    cursor: pointer;
+  }
+}
+
+/****鹰眼****/
+.leaflet-container {
+  border: 0.01rem solid #0092ff;
+  border-radius: 0.02rem;
+}
+
+/***工具***/
+.toolbar-browser {
+  .ant-btn {
+    background: var(--bgColor);
+    border: 0;
+    height: 0.50rem;
+    width: 0.50rem;
+    border-bottom: 0.01rem solid var(--bgColor);
+    color: var(--fontColor);
+  }
+}
+
+/****按钮颜色****/
+.cancel::after {
+  display: none;
+}
+
+/***Popconfirm显示在最高层***/
+.ant-popover {
+  z-index: 10000;
+}
+
+/***分页居中***/
+.ant-pagination {
+  text-align: center;
+}
+
+.header-report {
+  position: absolute;
+  top: 0.16rem;
+  right: 0.60rem;
+  color: #333;
+  border: 0.01rem solid #ccc;
+  padding-left: 0.10rem;
+  padding-right: 0.10rem;
+  border-radius: 0.04rem;
+  height: 0.25rem;
+  line-height: 0.25rem;
+  cursor: pointer;
+}
+
+/*-- 单选 start --*/
+.ant-radio-group,
+.ant-radio-wrapper,
+.ant-radio {
+  font-size: 0.14rem;
+}
+
+.ant-radio-inner {
+  width: 0.16rem;
+  height: 0.16rem;
+  border-width: 0.01rem;
+}
+
+.ant-radio-inner::after {
+  top: 0.03rem;
+  left: 0.03rem;
+  width: 0.08rem;
+  height: 0.08rem;
+  border-radius: 0.08rem;
+}
+
+span.ant-radio + * {
+  padding-right: 0.08rem;
+  padding-left: 0.08rem;
+}
+
+.ant-radio-checked::after {
+  border-width: 0.01rem;
+}
+
+/*-- 单选 end --*/
+
+/*-- 菜单栏 start --*/
+.ant-menu-vertical .ant-menu-item,
+.ant-menu-vertical-left .ant-menu-item,
+.ant-menu-vertical-right .ant-menu-item,
+.ant-menu-inline .ant-menu-item,
+.ant-menu-vertical .ant-menu-submenu-title,
+.ant-menu-vertical-left .ant-menu-submenu-title,
+.ant-menu-vertical-right .ant-menu-submenu-title,
+.ant-menu-inline .ant-menu-submenu-title {
+  font-size: 0.14rem;
+}
+
+/*-- 菜单栏 end --*/
+
+/*-- 按钮 start --*/
+.ant-btn {
+  height: 0.32rem;
+  padding: 0 0.15rem;
+  border-radius: 0.04rem;
+  font-size: 0.14rem;
+
+  & > .anticon + span, .ant-btn > span + .anticon {
+    margin-left: 0.08rem;
+  }
+}
+
+/*-- 按钮 end --*/
+
+/*-- 地图相关 start --*/
+.locate .ant-btn[data-v-25adaff4] {
+  height: 0.4rem !important;
+  border-radius: 0.04rem !important;
+}
+
+/*-- 地图相关 end --*/
+
+
+.ant-tabs-nav .ant-tabs-tab {
+  height: auto;
+}
+
+// 分页的
+.ant-pagination {
+  .ant-pagination-prev, .ant-pagination-next {
+    .ant-pagination-item-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
+//
+.ant-form-item label {
+  color: var(--zfColor) !important;
+}
+
+//
+.UnitModal {
+  label {
+    color: var(--zfColor);
+  }
+}
+
+
+/*日期选择*/
+.ant-calendar{
+  background: var(--bgColor) !important;
+  border: 1px solid var(--bdColor) !important;
+}
+.ant-calendar-range .ant-calendar-input, .ant-calendar-range .ant-calendar-time-picker-input{
+  color: var(--fontColor) !important;
+  background: var(--bgColor) !important;
+}
+.ant-calendar-column-header .ant-calendar-column-header-inner{
+  color: var(--fontColor) !important;
+}
+.ant-calendar-last-month-cell .ant-calendar-date, .ant-calendar-next-month-btn-day .ant-calendar-date, .ant-calendar-last-month-cell .ant-calendar-date:hover, .ant-calendar-next-month-btn-day .ant-calendar-date:hover{
+  color: #999999;
+}
+.ant-calendar-range .ant-calendar-in-range-cell::before{
+  background: var(--bgHoverColor) !important;
+}
+.ant-calendar-range.ant-calendar-time .ant-calendar-time-picker-inner{
+  background: #021a48 !important;
+}
+.ant-calendar-range.ant-calendar-time .ant-calendar-time-picker-inner{
+  padding-top: 0 !important;
+}
+.ant-calendar-range.ant-calendar-time .ant-calendar-time-picker-combobox{
+  background: #021a48 !important;
+  border: 1px solid var(--bdColor) !important;
+  color: var(--fontColor) !important;
+}
+.ant-calendar-time-picker-select-option-selected{
+  background: var(--bgHoverColor) !important;
+}
+.ant-calendar-time-picker-select li:hover{
+  background: var(--bgHoverColor) !important;
+}
+.ant-calendar .ant-calendar-ok-btn-disabled{
+  background: var(--bgColor) !important;
+  border-color: var(--bdColor) !important;
+  color: var(--fontColor) !important;
+}
+.ant-calendar-time .ant-calendar-footer .ant-calendar-time-picker-btn-disabled{
+  color: #999999 !important;
+}
+.ant-calendar-date:hover{
+  background: var(--bgHoverColor) !important;
+}

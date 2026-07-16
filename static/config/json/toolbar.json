@@ -1,0 +1,139 @@
+{
+  "desc": "地图工具配置文件",
+  "tipsDirectionDesc": "微件提示弹出位置枚举对象，若不配置则按默认不弹出方式处理。包括：NONE（不弹出，默认为不弹出） | TOP（往上弹出） | RIGHT（往右弹出） | BOTTOM（往下弹出） | RIGHT（往右弹出）",
+  "items1": [],
+  "items2": [
+    {
+      "id": "Pan",
+      "name": "平移",
+      "icon": "",
+      "class": "Pan",
+      "options": {
+        "position": "bottom",
+        "IsShowText": true
+      }
+    },
+    {
+      "id": "ZoomIn",
+      "name": "放大",
+      "icon": "",
+      "class": "ZoomIn",
+      "options": {
+        "IsShowText": true
+      }
+    },
+    {
+      "id": "ZoomOut",
+      "name": "缩小",
+      "icon": "",
+      "class": "ZoomOut",
+      "options": {
+        "IsShowText": true
+      }
+    },
+    {
+      "id": "FullScreen",
+      "name": "全图",
+      "icon": "",
+      "class": "FullScreen",
+      "options": {
+        "IsShowText": true
+      }
+    },
+    {
+      "id": "LayerManager",
+      "name": "图层管理",
+      "icon": "",
+      "class": "LayerManager",
+      "options": {
+        "position": "left",
+        "IsShowText": true
+      }
+    },
+    {
+      "id": "ClearLayer",
+      "name": "清空图层",
+      "icon": "",
+      "class": "ClearLayer",
+      "options": {
+        "position": "right",
+        "IsShowText": true
+      }
+    }
+  ],
+  "items3": [
+    {
+      "id": "itemGroup",
+      "name": "属性查询",
+      "icon": "shuxingchaxun",
+      "class": "ToolbarGroup",
+      "items": [
+        {
+          "id": "Identify",
+          "name": "点选查询",
+          "icon": "",
+          "class": "Identify",
+          "tipsDirection": "RIGHT",
+          "options": {
+            "Config": "./static/config/json/IdentifyConfig.json"
+          }
+        },
+        {
+          "id": "RectIdentify",
+          "name": "框选查询",
+          "icon": "",
+          "class": "RectIdentify",
+          "tipsDirection": "RIGHT",
+          "options": {
+            "Config": "./static/config/json/IdentifyConfig.json"
+          }
+        },
+        {
+          "id": "PolyIdentify",
+          "name": "多边形查询",
+          "icon": "",
+          "class": "PolyIdentify",
+          "tipsDirection": "RIGHT",
+          "options": {
+            "Config": "./static/config/json/IdentifyConfig.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "Measure",
+      "name": "测量",
+      "icon": "",
+      "class": "Measure",
+      "options": {}
+    },
+    {
+      "id": "Draw",
+      "name": "绘制",
+      "icon": "",
+      "class": "Draw",
+      "options": {}
+    },
+    {
+      "id": "LayerManager",
+      "name": "图层管理",
+      "icon": "",
+      "class": "LayerManager",
+      "options": {
+        "position": "RIGHT",
+        "IsShowText": true
+      }
+    },
+    {
+      "id": "ExportImg",
+      "name": "截图",
+      "icon": "",
+      "class": "ExportImg",
+      "options": {
+        "position": "right",
+        "IsShowText": true
+      }
+    }
+  ],
+  "items4": []
+}

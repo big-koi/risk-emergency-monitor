@@ -1,0 +1,341 @@
+:root {
+  /* 设置字号模板 */
+  --fontSize-h1: 0.22rem;
+  --fontSize-h2: 0.18rem;
+  --fontSize-h3: 0.16rem;
+  --fontSize-h4: 0.14rem;
+  --fontSize-content: 0.14rem;
+  --fontSize-tips: 0.12rem;
+  --fontSize-interval: 0.02rem;
+
+  /* 主题颜色 */
+  --bgColor: #fff;
+  --bgHoverColor: #e6f7ff;
+  --whiteColor: #fff;
+  --bgTransColor: rgba(255, 255, 255, 0.96);
+  --bdColor: #ddd;
+  --bgColor2: rgba(0, 0, 0, 0.25);
+  --bgColor3: #1f71ff;
+  --bdHoverColor: #000000;
+  --fontColor: #000000;
+  --fontAssistColor: #000;
+  --fontHoverColor: #000;
+  --fontFamily: "微软雅黑";
+  --boxShadow: 0rem 0.01rem 0.03rem 0rem rgba(0, 0, 0, 0.18);
+  --boxShadow2: 0rem 0.02rem 0.02rem 0rem rgba(0, 0, 0, 0.18);
+  --bgTransparent: rgba(255, 255, 255, 0.96);
+  --borderDefault: 0.01rem solid #fff;
+  --titleColor: #191b3d;
+  --fontSize-icon: 0.24rem;
+  --iconColor: #54566f;
+  --iconHoverColor: #0c89f5;
+
+  --fontColorGray: #54566f;
+
+  --transparent: transparent;
+  --axisColor: #fff;
+  --axisBorderColor: rgba(0, 0, 0, 0.38);
+
+  --scrollTrackColor: #ededed;
+  /* --scrollBarShadow:inset 0 0 0.05rem linear-gradient(137deg,#4ecafa 23%, #459cf6); */
+  --scrollBarThumbBgColor: #aaa;
+
+  --TlBgColor: #fff;
+  --TlColor: #6A6A6A;
+  --TlDotColor: #05A0FF;
+  --TlDotBgColor: #fff;
+  --TlActiveColor: #0077ef;
+  --TlActiveBorderColor: #0077ef;
+  --TlActivedotBorderAfter: #fff;
+  --TlActivedotBgColorAfter: #0077ef;
+  --TlSlideBorderColor: #0077EF;
+  --resultColor: #1890ff;
+
+  --borderColor: #eee;
+}
+
+.diit-header {
+  background: url(images/banner.png) no-repeat 50%;
+  background-size: 100% 100%;
+  padding: 0rem;
+  height: 0.70rem;
+  margin-bottom: 0;
+}
+
+/* .diit-map{
+  background: url(../images/map_bg.png) no-repeat center center;
+  background-size:100% 100%;
+} */
+
+/* .region-pop {
+  background: url("images/xzqh.png") no-repeat center center;
+} */
+.ant-modal-header {
+  /*  background: url("images/mark.png") no-repeat 0.10rem center; */
+  border-bottom: 0.01rem solid #eee;
+  /* padding-left:0.30rem !important; */
+}
+
+.ant-modal-close-x {
+  background: url("images/close.png") no-repeat 0.10rem center;
+}
+
+.ant-modal-close-x i {
+  display: none;
+}
+
+.product-selected {
+  background: #1f71ff url("images/ResourceTree/shujuchanpin.png") no-repeat center center;
+}
+
+.product-unselected {
+  background: url("images/ResourceTree/shujuchanpin.png") no-repeat center center;
+  color: #fff;
+}
+
+.datalist-selected {
+  background: #1f71ff url("images/ResourceTree/shujuziyuan.png") no-repeat center center;
+}
+
+.datalist-unselected {
+  background: url("images/ResourceTree/shujuziyuan.png") no-repeat center center;
+  color: #fff;
+}
+
+/* .toolItem .ant-btn{
+  margin-left:0rem !important;
+} */
+.toolbarclasshorizontal {
+  /* padding:0.03rem 0.08rem;
+  background: #fff;
+  border-radius:0.05rem; */
+  display: flex;
+  align-items: center;
+}
+
+/*.toolbarclasshorizontal .toolItem .ant-btn {*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*}*/
+
+/***弹出框***/
+.dialog .ant-modal-content {
+  padding-bottom: 0.20rem;
+}
+
+.btn {
+  color: #fff;
+}
+
+.dialog .ant-modal-header .ant-modal-title {
+  background: url(images/mark.png) no-repeat left center;
+  padding-left: 0.25rem;
+}
+
+.ant-dropdown-menu-item,
+.ant-dropdown-menu-submenu-title {
+  color: var(--fontColorGray);
+}
+
+.toolbar-operation {
+  background: #fff;
+}
+
+/***tree start***/
+.dataresource .ant-tree > li > .ant-tree-switcher {
+  background: url(images/tree_root.png) no-repeat 0.18rem center !important;
+}
+
+.dataresource .ant-tree-child-tree .ant-tree-node-content-wrapper {
+  background: url(images/tree_filer.png) no-repeat 0.05rem center;
+}
+
+.dataresource
+.ant-tree-child-tree
+.ant-tree-switcher-noop
+~ .ant-tree-node-content-wrapper {
+  background: url(images/tree_file.png) no-repeat 0.05rem center;
+}
+
+.dataresource .ant-tree-checkbox-checked + .ant-tree-node-content-wrapper {
+  background: url(images/tree_file_active.png) no-repeat 0.05rem center !important;
+}
+
+/* 收藏不需要图标 */
+.careresource .ant-tree > li > .ant-tree-switcher {
+  background: none !important;
+}
+
+.careresource .ant-tree-child-tree .ant-tree-node-content-wrapper {
+  background: none !important;
+}
+
+.careresource
+.ant-tree-child-tree
+.ant-tree-switcher-noop
+~ .ant-tree-node-content-wrapper {
+  background: none !important;
+}
+
+/* 收藏不需要图标 */
+
+.tree-content
+.ant-tree-child-tree
+.ant-tree-checkbox-disabled
+~ .ant-tree-node-content-wrapper {
+  background: url(images/tree_filer.png) no-repeat 0.05rem center;
+}
+
+.tree-main .ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
+  background-color: var(--bgHoverColor);
+}
+
+.tree-main .ant-tree li .ant-tree-node-content-wrapper:hover {
+  background-color: var(--bgHoverColor);
+}
+
+.tree-main .ant-tree-child-tree .ant-tree-node-content-wrapperr:hover {
+  background: url(images/tree_filer.png) no-repeat 0.05rem center;
+}
+
+.tree-main
+.ant-tree-child-tree
+.ant-tree-treenode-checkbox-checked
+.ant-tree-node-content-wrapper:hover {
+  background: var(--bgHoverColor) url(images/tree_file_active.png) no-repeat 0.05rem center;
+}
+
+.tree-main
+.ant-tree
+> li
+> .ant-tree-switcher
++ .ant-tree-node-content-wrapper.ant-tree-node-selected,
+.tree-main
+.ant-tree
+> li
+> .ant-tree-switcher
++ .ant-tree-node-content-wrapper:hover {
+  background: var(--bgHoverColor) !important;
+}
+
+.tree-main
+.ant-tree
+.ant-tree
+li
+.ant-tree-node-content-wrapper:hover.ant-tree-node-selected {
+  background: var(--bgHoverColor) url(images/tree_file.png) no-repeat 0.05rem center;
+}
+
+.tree-main
+.ant-tree
+.ant-tree-child-tree
+.ant-tree-switcher-noop
+~ .ant-tree-node-content-wrapper:hover.ant-tree-node-selected {
+  background-color: var(--bgHoverColor);
+}
+
+.tree-content .ant-tree-node-content-wrapper-open .ant-tree-title {
+  background: url(images/arrow_down.png) no-repeat right center;
+  padding-right: 0.20rem;
+}
+
+.tree-content .ant-tree-node-content-wrapper-close .ant-tree-title {
+  background: url(images/arrow_right.png) no-repeat right center;
+  padding-right: 0.20rem;
+}
+
+.tree-content
+.ant-tree-child-tree
+.ant-tree-checkbox-disabled
+~ .ant-tree-node-content-wrapper:hover {
+  background: var(--bgHoverColor) url(images/tree_filer.png) no-repeat 0.05rem center;
+}
+
+/***tree end***/
+
+.toolbar-group-box .d-menu .d-menu-item:hover {
+  background: #e6f7ff !important;
+}
+
+.toolbar3 {
+  background: transparent;
+}
+
+.toolbar3 .tool-bar-item:first-child {
+  background: var(--bgColor);
+}
+
+.botmap-box .basemap-item a p {
+  color: var(--bgColor) !important;
+}
+
+.desp .desp-title {
+  background: transparent !important;
+}
+
+/****时间轴*****/
+.map-scaleAxis {
+  background: var(--bgColor);
+}
+
+.ScaleAxis .start,
+.ScaleAxis .item-year {
+  color: var(--fontColor);
+}
+
+.dialogSpanColorImport .panel-import .upload-box button {
+  background: transparent !important;
+}
+
+.timeline-box {
+  background: #fff;
+}
+
+/** table**/
+.ant-table-header {
+  overflow: hidden !important;
+  border-right: 0.06rem solid var(--bdColor);
+}
+
+.ant-table-fixed-header .ant-table-scroll .ant-table-header {
+  margin-bottom: 0 !important;
+}
+
+.ant-table-thead {
+  background: #f5f5f5;
+}
+
+.ant-table-thead > tr > th {
+  background: transparent !important;
+}
+
+/*地图当前比例尺、坐标信息*/
+.map-currentSpaceInfo {
+  background: rgba(255, 255, 255, 0.4);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 0.02rem 0.13rem;
+  font-size: 0.14rem;
+  width: 100%;
+}
+
+.deep_img {
+  display: none;
+}
+
+.light_img {
+  display: inline-block;
+}
+
+.cityName {
+  border-bottom: 0.01rem dashed var(--bdColor);
+  font-weight: bold;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSize-h2);
+  color: var(--fontColor);
+}
+
+.cityName a {
+  color: var(--fontColor) !important;
+}

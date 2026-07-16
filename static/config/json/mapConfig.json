@@ -1,0 +1,257 @@
+﻿{
+  "serverURL": "http://192.9.30.142:8081/",
+  "apiConfig": {
+    "path": "./static/config/js/map/restApiConfig.js",
+    "proxyUrl": "",
+    "apiBbaseUrl": "http://192.168.11.219:8100/jcmh/",
+    "soeUrl": "http://test.diit.cn:4460/arcgis/rest/services/42TB/GL_PGXM/MapServer"
+  },
+  "appConfig": {
+    "themeDesc": "white | deepblue | green | white 三种有题选择",
+    "themeName": "deepblue",
+    "fontSizeDesc": "large | middle | little 三种字号选择",
+    "fontSize": "little"
+  },
+  "mapConfig": {
+    "initExtent": {
+      "xmin": 73.499304,
+      "ymin": 34.333622,
+      "xmax": 96.386258,
+      "ymax": 49.180167,
+      "spatialReference": {
+        "wkid": 4490
+      }
+    },
+    "planespatialReference": {
+      "wkid": 4528
+    },
+    "xzqhConfig": {
+      "name": "新疆维吾尔自治区",
+      "code": "650000"
+    },
+    "zoom": 6.5,
+    "minzoom": 1,
+    "maxzoom": 50000000,
+    "layerIsProxy": false,
+    "token": {
+      "key": "",
+      "value": "123454654653654"
+    },
+    "toolbarConfig": "./static/config/json/toolbar.json"
+  },
+  "defaultMap": {
+    "topmaps": [
+      {
+        "id": "tdtzj",
+        "icon": "./static/config/images/basemaps/gh.png",
+        "url": "https://t1.tianditu.gov.cn/cia_c/wmts?tk=73544acc9abce21e7fd4523c6f077d74&layer=cia&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&tilematrixset=c&format=tiles&tilematrix={z}&tilerow={y}&tilecol={x}",
+        "type": "16",
+        "options": {
+          "visible": true,
+          "name": "注记",
+          "type": "风险普查"
+        }
+      },
+      {
+        "id": "tdtdzzj",
+        "icon": "./static/config/images/basemaps/xzqh.png",
+        "url": "https://fxpc.mem.gov.cn/data_preparation/30ac6c8f-0770-4012-ba53-48892d9dd3da/86b56586-2db0-4dfb-b5c2-a201c193a2d6/wmts?service=wmts&request=gettile&version=1.0.0&layer=cia&style=default&tilematrixset=c&format=tiles&tilematrix={z}&tilerow={y}&tilecol={x}&geokey=204CB71D115966E16812D5B97FD2A6B5",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "电子注记",
+          "type": "风险普查"
+        }
+      },
+      {
+        "id": "testcva",
+        "icon": "./static/config/images/basemaps/gh.png",
+        "url": "https://120.52.31.31:9494/service/api/egis/base/v1/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=cva&style=default&format=tiles&tileMatrixSet=c&tileMatrix={z}&tileRow={y}&tileCol={x}&Authorization=Basic MjhhMTJkM2JiYWJhNGQwMGI4NzcwODUwNWE0Y2U4MDM6anhIdEhKbCE=",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "矢量注记(2022年6月)"
+        }
+      },
+      {
+        "id": "testcia",
+        "icon": "./static/config/images/basemaps/gh.png",
+        "url": "https://120.52.31.31:9494/service/api/egis/base/v1/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=cia&style=default&format=tiles&tileMatrixSet=c&tileMatrix={z}&tileRow={y}&tileCol={x}&Authorization=Basic MjhhMTJkM2JiYWJhNGQwMGI4NzcwODUwNWE0Y2U4MDM6anhIdEhKbCE=",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "影像注记(2022年6月)"
+        }
+      },
+      {
+        "id": "testcta",
+        "icon": "./static/config/images/basemaps/gh.png",
+        "url": "https://120.52.31.31:9494/service/api/egis/base/v1/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=cta&style=default&format=tiles&tileMatrixSet=c&tileMatrix={z}&tileRow={y}&tileCol={x}&Authorization=Basic MjhhMTJkM2JiYWJhNGQwMGI4NzcwODUwNWE0Y2U4MDM6anhIdEhKbCE=",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "地形注记(2022年6月)"
+        }
+      }
+    ],
+    "basemaps": [
+      {
+        "id": "tdlyxz",
+        "icon": "./static/config/images/basemaps/xz.png",
+        "url": "https://fxpc.mem.gov.cn/data_preparation/30ac6c8f-0770-4012-ba53-48892d9dd3da/86b56586-2db0-4dfb-b5c2-a201c193a2d6/wmts?service=wmts&request=gettile&version=1.0.0&layer=vec&style=default&tilematrixset=c&format=tiles&tilematrix={z}&tilerow={y}&tilecol={x}&geokey=204CB71D115966E16812D5B97FD2A6B5",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "电子地图",
+          "type": "风险普查"
+        }
+      },
+      {
+        "id": "tdlimg1",
+        "icon": "./static/config/images/basemaps/yx.png",
+        "url": "https://fxpc.mem.gov.cn/data_preparation/30ac6c8f-0770-4012-ba53-48892d9dd3da/86b56586-2db0-4dfb-b5c2-a201c193a2d6/wmts?service=wmts&request=gettile&version=1.0.0&layer=img&style=default&tilematrixset=c&format=tiles&tilematrix={z}&tilerow={y}&tilecol={x}&geokey=204CB71D115966E16812D5B97FD2A6B5",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "影像",
+          "type": "风险普查"
+        }
+      },
+      {
+        "id": "tdldem1",
+        "icon": "./static/config/images/basemaps/dem.png",
+        "url": "https://fxpc.mem.gov.cn/data_preparation/30ac6c8f-0770-4012-ba53-48892d9dd3da/86b56586-2db0-4dfb-b5c2-a201c193a2d6/wmts?service=wmts&request=gettile&version=1.0.0&layer=dem&style=default&tilematrixset=c&format=tiles&tilematrix={z}&tilerow={y}&tilecol={x}&geokey=204CB71D115966E16812D5B97FD2A6B5",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "地形",
+          "type": "风险普查"
+        }
+      },
+      {
+        "id": "basemap",
+        "icon": "./static/config/images/basemaps/tdt_vec.png",
+        "type": "16",
+        "url": "https://t1.tianditu.gov.cn/vec_c/wmts?service=wmts&request=gettile&version=1.0.0&layer=img&style=default&tilematrixset=c&format=tiles&tilematrix={z}&tilerow={y}&tilecol={x}&tk=73544acc9abce21e7fd4523c6f077d74",
+        "options": {
+          "visible": false,
+          "name": "矢量",
+          "type": "公网天地网"
+        }
+      },
+      {
+        "id": "tdlimg2",
+        "icon": "./static/config/images/basemaps/yx.png",
+        "url": "https://t0.tianditu.gov.cn/img_c/wmts?tk=2b4dbd63705acef3a76f69a71aff5a0d&layer=img&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&tilematrix={z}&tilerow={y}&tilecol={x}",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "天地图影像",
+          "type": "公网天地网"
+        }
+      },
+      {
+        "id": "testvec",
+        "icon": "./static/config/images/basemaps/tdt_vec.png",
+        "url": "https://dgs-servicebusgate1.yjglcloud.mem.gov.cn/service/api/egis/base/v1/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=vec&style=default&format=tiles&tileMatrixSet=c&tileMatrix={z}&tileRow={y}&tileCol={x}&Authorization=Basic MjhhMTJkM2JiYWJhNGQwMGI4NzcwODUwNWE0Y2U4MDM6anhIdEhKbCE=",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "矢量底图(2022年6月)",
+          "type": "EGIS底图"
+        }
+      },
+      {
+        "id": "testkd",
+        "icon": "./static/config/images/basemaps/yx.png",
+        "url": "https://dgs-servicebusgate1.yjglcloud.mem.gov.cn/service/api/egis/base/v1/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=kd&style=default&format=tiles&tileMatrixSet=c&tileMatrix={z}&tileRow={y}&tileCol={x}&Authorization=Basic MjhhMTJkM2JiYWJhNGQwMGI4NzcwODUwNWE0Y2U4MDM6anhIdEhKbCE=",
+        "type": "16",
+        "options": {
+          "visible": true,
+          "name": "0.27米全国高分影像融合版(2021年6月)",
+          "type": "EGIS底图"
+        }
+      },
+      {
+        "id": "testfxgf",
+        "icon": "./static/config/images/basemaps/yx.png",
+        "url": "https://dgs-servicebusgate1.yjglcloud.mem.gov.cn/service/api/egis/base/v1/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=fxgf&style=default&format=tiles&tileMatrixSet=c&tileMatrix={z}&tileRow={y}&tileCol={x}&Authorization=Basic MjhhMTJkM2JiYWJhNGQwMGI4NzcwODUwNWE0Y2U4MDM6anhIdEhKbCE=",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "0.8米全国影像历史版(2020年8月)",
+          "type": "EGIS底图"
+        }
+      },
+      {
+        "id": "testimg",
+        "icon": "./static/config/images/basemaps/yx.png",
+        "url": "https://dgs-servicebusgate1.yjglcloud.mem.gov.cn/service/api/egis/base/v1/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=img&style=default&format=tiles&tileMatrixSet=c&tileMatrix={z}&tileRow={y}&tileCol={x}&Authorization=Basic MjhhMTJkM2JiYWJhNGQwMGI4NzcwODUwNWE0Y2U4MDM6anhIdEhKbCE=",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "0.5米全国影像最新版(2022年06月)",
+          "type": "EGIS底图"
+        }
+      },
+      {
+        "id": "testter",
+        "icon": "./static/config/images/basemaps/dem.png",
+        "url": "https://dgs-servicebusgate1.yjglcloud.mem.gov.cn/service/api/egis/base/v1/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=ter&style=default&format=tiles&tileMatrixSet=c&tileMatrix={z}&tileRow={y}&tileCol={x}&Authorization=Basic MjhhMTJkM2JiYWJhNGQwMGI4NzcwODUwNWE0Y2U4MDM6anhIdEhKbCE=",
+        "type": "16",
+        "options": {
+          "visible": false,
+          "name": "地形底图(2022年6月)",
+          "type": "EGIS底图"
+        }
+      }
+    ]
+  },
+  "earthConfig": {
+    "center": {
+      "y": 35.267339,
+      "x": 120.05869,
+      "z": 136000,
+      "heading": 0.3,
+      "pitch": -45,
+      "roll": 0
+    },
+    "location": {
+      "visible": true
+    },
+    "toolbarConfig": "./static/config/json/toolbarEarth.json",
+    "terrainConfig": {
+      "url": "http://data.marsgis.cn/terrain",
+      "terrainExaggeration": 1,
+      "visible": false
+    },
+    "globalConfig": {
+      "type": "14",
+      "url": "",
+      "icon": "./static/config/images/basemaps/tdt_img.png",
+      "options": {
+        "name": "天地图卫星",
+        "type": "www_tdt",
+        "layer": "img_d",
+        "key": ["79fbd92c33b0d769640a42d04c04da90"],
+        "order": 0,
+        "visible": true
+      }
+    }
+  },
+  "resouceTreeConfig": {
+    "DataResource": {
+      "name": "数据资源目录",
+      "desc": "数据资源目录配置",
+      "isShow": true,
+      "dataAPI": "http://211.103.164.25:18520/schemaTree/getResourceTree?schematypeId=cc11a048ecd9e4486bcdbe916ae8106e",
+      "dataAPIType": "Interface"
+    },
+    "DataProduct": {
+      "name": "数据产品目录",
+      "desc": "数据产品目录配置",
+      "isShow": true,
+      "dataAPI": ""
+    }
+  }
+}

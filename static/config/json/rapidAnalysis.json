@@ -1,0 +1,33 @@
+{
+    "flood": {
+        "steps": [
+            {
+                "id": 1,
+                "stepName": "评估范围提取",
+                "component": "evaluateScope.vue",
+                "currentDiaster": "",
+                "status": 1
+            },
+            {
+                "id": 2,
+                "stepName": "内涝仿真模型计算",
+                "component": "modeling.vue",
+                "status": 0
+            },
+            {
+                "id": 3,
+                "stepName": "雨洪仿真结果",
+                "component": "simulationResult.vue",
+                "status": 0
+            },
+            {
+              "id": 4,
+              "stepName": "预警等级评估",
+              "component": "earlyWarningLevel.vue",
+              "status": 0
+            }
+        ]
+    },
+    "dafeng": {},
+    "leidian": {}
+}

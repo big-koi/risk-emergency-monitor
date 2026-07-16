@@ -1,0 +1,155 @@
+/*-- 用于顶替UI框架(ant-design)的样式 --*/
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td{
+  padding: 10px;
+}
+
+body {
+  // layout 布局
+  .ant-layout-header {
+    height: 0.64rem;
+    padding: 0 0.50rem;
+    line-height: 0.64rem;
+  }
+
+  /************* 分割线 *************/
+
+  // 菜单
+  .ant-menu {
+    font-size: 0.14rem;
+  }
+
+  .ant-menu-horizontal {
+    line-height: 0.46rem;
+
+    > .ant-menu-item,
+    > .ant-menu-submenu {
+      top: 0.01rem;
+      border-bottom-width: 0.02rem;
+    }
+
+    .ant-menu-item,
+    .ant-menu-submenu {
+      margin-top: -0.01rem;
+    }
+
+    > .ant-menu-item:hover,
+    > .ant-menu-submenu:hover,
+    > .ant-menu-item-active,
+    > .ant-menu-submenu-active,
+    > .ant-menu-item-open,
+    > .ant-menu-submenu-open,
+    > .ant-menu-item-selected,
+    > .ant-menu-submenu-selected {
+      border-bottom-width: 0.02rem;
+    }
+  }
+
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    padding: 0 0.20rem;
+
+    .anticon {
+      min-width: 0.14rem;
+      margin-right: 0.10rem;
+      font-size: 0.14rem;
+    }
+  }
+
+  /************* 分割线 *************/
+
+  // button 按钮
+  .ant-btn {
+    height: 0.32rem;
+    padding: 0 0.15rem;
+    border-width: 0.01rem;
+    border-radius: 0.04rem;
+    font-size: 0.14rem;
+    box-shadow: none;
+
+    & > .anticon + span, .ant-btn > span + .anticon {
+      margin-left: 0.08rem;
+    }
+  }
+
+  .ant-btn-icon-only {
+    width: 0.32rem;
+  }
+
+  .ant-btn-primary {
+    box-shadow: none;
+  }
+
+  /************* 分割线 *************/
+
+  // select 选择器
+  .ant-select {
+    font-size: 0.14rem;
+  }
+
+  .ant-select-selection--single {
+    height: 0.32rem;
+
+    .ant-select-selection__rendered {
+      margin-right: 0.24rem;
+    }
+  }
+
+  .ant-select-selection {
+    border-width: 0.01rem;
+    border-radius: 0.04rem;
+  }
+
+  .ant-select-selection__rendered {
+    line-height: 0.30rem;
+    margin-right: 0.11rem;
+    margin-left: 0.11rem;
+  }
+
+  .ant-select-arrow {
+    right: 0.11rem;
+    font-size: 0.12rem;
+  }
+
+  /************* 分割线 *************/
+
+  // form 表单
+  .ant-form-item {
+    margin-bottom: 0;
+    font-size: 0.14rem;
+  }
+
+  .ant-form-item-label {
+    line-height: 0.40rem;
+  }
+
+  .ant-form-item-control {
+    line-height: 0.40rem;
+  }
+
+  /************* 分割线 *************/
+
+  // input 输入框
+  .ant-input {
+    height: 0.32rem;
+    padding: 0.04rem 0.11rem;
+    border-width: 0.01rem;
+    font-size: 0.14rem;
+    border-radius: 0.04rem;
+  }
+
+  /************* 分割线 *************/
+
+  // 复选框
+  .ant-checkbox-wrapper {
+    font-size: 0.14rem;
+
+    .ant-checkbox {
+      font-size: 0.14rem;
+    }
+
+    .ant-checkbox + span {
+      padding-right: 0.08rem;
+      padding-left: 0.08rem;
+    }
+  }
+}

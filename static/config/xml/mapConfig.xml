@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  code：地图服务编码，不可以随意增加、删除、修改
+  name：地图名称，会在使用图例、图层等地图工具时标识地图服务名称
+  url：地图服务地址
+  type：地图服务类型（1：瓦片，2：动态。默认2）
+  opacity：地图透明度（0到1。默认1）
+  year：地图服务所属年份
+  layerIds：使用的地图服务图层集合（英文逗号分隔）
+  locateLayerId：图斑定位用图层
+  relateField：图斑定位时页面数据中的关联字段
+  relateFieldMap：图斑定位时地图服务中的关联字段
+
+  基础配置项：name、url、type、opacity、year。
+  若数据库和地图服务是规范的，则只需要使用基础配置项
+  year配置项不是必需的，只有涉及多年份地图服务时才需要，保证code不变的情况下，可以增加其他年份的map配置
+
+  扩展配置项：layerIds、locateLayerId、relateField、relateFieldMap
+  若数据库或地图服务不规范，则需要扩展配置项来支持功能。强烈建议规范数据库和地图服务
+  layerIds：当只想加载地图服务中某几个图层时
+  locateLayerId：当图斑定位图层不是0时
+  relateField：当数据库或地图服务不规范时
+  relateFieldMap：当数据库或地图服务不规范时
+-->
+<mapConfig>
+  <!--探矿权、采矿权-->
+  <map code="tkq" name="探矿权" url="http://192.9.30.248:31100/urltest/arcgis/rest/services/12GTDC/DLTB_2018/MapServer" />
+  <map code="ckq" name="采矿权" url="http://192.9.30.248:31100/urltest/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+    <!--探矿权、采矿权-->
+  <map code="pi" name="批" url="http://192.9.30.248:31100/urltest/arcgis/rest/services/12GTDC/DLTB_2019/MapServer" />
+  <map code="gong" name="供" url="http://192.9.30.248:31100/urltest/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+  <map code="yong" name="用" url="http://192.9.30.248:31100/urltest/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+  <map code="bu" name="补" url="http://192.9.30.248:31100/urltest/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+  <map code="cha" name="查" url="http://192.9.30.248:31100/urltest/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+  <!--数据填报-->
+  <map code="lsyd" name="临时用地" url="http://192.9.30.248:31100/urltest/arcgis/rest/services/52XJHJ/LSYD/MapServer" />
+
+  <map code="jsxmysyxz" name="建设项目预审与选址" url="http://test.diit.cn:4460/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+
+  <map code="qygz" name="企业改制" url="http://test.diit.cn:4460/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+
+  <map code="sxydsp" name="三项用地（分批次）审批" url="http://test.diit.cn:4460/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+
+  <map code="xycrzjf" name="协议出让自建房" url="http://test.diit.cn:4460/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+
+  <map code="zjfzr" name="自建房转让" url="http://test.diit.cn:4460/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+
+  <map code="hfjsydghxkz" name="核发建设用地规划许可证" url="http://test.diit.cn:4460/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+
+  <map code="hbfsqdtdsyqzr" name="划拨方式取得的土地使用权转让" url="http://test.diit.cn:4460/arcgis/rest/services/52XJHJ/CKQDJ/MapServer" />
+</mapConfig>
