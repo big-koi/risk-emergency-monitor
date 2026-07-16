@@ -145,62 +145,39 @@
       :imageLayer="olPreviewImageLayer"
       @close="olPreviewVisible = false"
     />
-    <!-- 任务列表 -->
-    <div class="task-list-box">
-      <div style="display: flex;">
-        <div>
-          <buttonPostion
-            :regionDisplayLabel="regionToolbarDisplayLabel"
-            @upladeLine="upladeLine"
-            @positionXzqCode="getPositionXzqCode"
-            @regionBack="handleRegionNavigateBack"
-            ref="buttonPostion"
-          >
-          </buttonPostion>
-        </div>
-        <div @click="showIdentify" class="button">
-          <img src="../../assets/images/rapidAnalysis/dwcxIcon.png" alt=""
-            style="font-size: 0.2rem;height: 0.2rem;margin-right: 0.05rem;" />点位查询
-        </div>
-        <div class="button" @click="openLayerList">
-          <img style="font-size: 0.2rem;height: 0.2rem;margin-right: 0.05rem;"
-            src="../../assets/images/rapidAnalysis/jctcIcon.png" alt="" />基础图层
-        </div>
-        <div class="button" @click="openCaseCollcetion">
-          <a-icon type="star" style="font-size: 0.2rem;height: 0.2rem;margin-right: 0.05rem;color: #98CCFF;" />
-          收藏夹
-        </div>
-        <div class="button" @click="openTaskList" v-if="isTaskListBtn">
-          <a-icon type="profile" style="font-size: 18px;color: #1890ff;padding-right: 5px;" />
-          任务列表
-          <a-icon type="up" v-if="showTaskList" style="font-size: 14px;padding-left: 5px;" />
-          <a-icon type="down" v-if="!showTaskList" style="font-size: 14px;padding-left: 5px;" />
-        </div>
-      </div>
-      <div class="task-list" v-if="showTaskList">
-        <div class="task-list-btn-box">
-          <span class="task-list-return-btn" v-if="taskTimeDataList.length > 0" @click="taskTimeDataList = []"><a-icon
-              type="left" />返回</span>
-          <div class="switch-to-latest" @click="taskItemClick('new')" v-if="taskTimeDataList.length === 0">
-            <a-icon type="sync" />
-            切换至最新时间
-          </div>
-          <a-icon type="close-circle" style="cursor: pointer;" @click="showTaskList = false"
-            v-if="taskTimeDataList.length === 0" />
-        </div>
-        <a-calendar :fullscreen="false" style="width: 100%;" @select="taskCalendarSelect"
-          v-show="taskTimeDataList.length === 0" />
-        <ul class="tiem-list-box" v-if="taskTimeDataList.length > 0">
-          <li class="time-item" v-for="(item, index) in taskTimeDataList" :key="index" :class="item.id != undefined ? 'time-item-active' : 'time-item-no-drop'
-            ">
-            <span class="time-item-name" @click="taskItemClick(item)">{{
-              adjustForecastTime(item.tasktime)
-              }}</span>
-            <a-icon type="star" class="star-box" @click="starCase(item)" v-if="isCaseCollectionDetailsShow" />
-          </li>
-        </ul>
-      </div>
-    </div>
+    <!-- 地图工具条 + 任务列表 -->
+    <MapToolbarShell
+      :showTaskListBtn="isTaskListBtn"
+      :taskListOpen="showTaskList"
+      @identify="showIdentify"
+      @open-layers="openLayerList"
+      @open-favorites="openCaseCollcetion"
+      @toggle-task-list="openTaskList"
+    >
+      <template slot="region">
+        <buttonPostion
+          :regionDisplayLabel="regionToolbarDisplayLabel"
+          @upladeLine="upladeLine"
+          @positionXzqCode="getPositionXzqCode"
+          @regionBack="handleRegionNavigateBack"
+          ref="buttonPostion"
+        />
+      </template>
+      <template slot="task-list">
+        <TaskListPanel
+          :visible="showTaskList"
+          :timeList="taskTimeDataList"
+          :showStar="isCaseCollectionDetailsShow"
+          :formatTime="adjustForecastTime"
+          @close="showTaskList = false"
+          @back="taskTimeDataList = []"
+          @select-latest="taskItemClick('new')"
+          @select-item="taskItemClick"
+          @calendar-select="taskCalendarSelect"
+          @star="starCase"
+        />
+      </template>
+    </MapToolbarShell>
     <!-- 信息查询 -->
     <Identify ref="identifyDom" @addMaker="addMaker" v-if="earthMap" :earthMap="earthMap" :IdentifyShow="IdentifyShow"
       @closeClick="closeClick" @printStar="printStarClick" />
@@ -322,246 +299,40 @@
       @toggle-jssd="jssdTlCheck"
     />
     <!-- 地图点位弹窗 -->
-    <div class="identify-popup-wrapper" id="mapMarkerModel" v-show="popupShow">
-      <div class="identify-popup-header">
-        <span>详情</span>
-        <a-icon @click="closeIdentify" class="identify-popup-close" style="cursor: pointer" type="close" />
-      </div>
-      <div class="identify-popup-content" v-if="identifyModel.type == 'qxyj'">
-        {{ identifyModel.conten }}
-      </div>
-      <div class="identify-popup-content" v-else-if="identifyModel.type == 'byyj'">
-        <div class="con identify-con">
-          <p class="identify-con-label">省名：</p>
-          <p class="identify-con-value">
-            {{ identifyModel.shengname || "--" }}
-          </p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">市名：</p>
-          <p class="identify-con-value">{{ identifyModel.shiname || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">预警指标：</p>
-          <p class="identify-con-value">{{ identifyModel.maxprcp || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">预警时间：</p>
-          <p class="identify-con-value">{{ identifyModel.yjtime || "--" }}</p>
-        </div>
-      </div>
-      <div v-else class="identify-popup-content">
-        <div class="con identify-con">
-          <p class="identify-con-label">详细地址：</p>
-          <p class="identify-con-value">{{ identifyModel.address || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">地点名称：</p>
-          <p class="identify-con-value">{{ identifyModel.poi || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">省级名称：</p>
-          <p class="identify-con-value">{{ identifyModel.province || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">市级名称：</p>
-          <p class="identify-con-value">{{ identifyModel.city || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">县级名称：</p>
-          <p class="identify-con-value">{{ identifyModel.county || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">乡镇名称：</p>
-          <p class="identify-con-value">{{ identifyModel.town || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">经度：</p>
-          <p class="identify-con-value">{{ identifyModellon || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">纬度：</p>
-          <p class="identify-con-value">{{ identifyModellat || "--" }}</p>
-        </div>
-        <!-- <div class="con identify-con">
-          <p class="identify-con-label">详细地址：</p>
-          <p class="identify-con-value">{{ identifyModel.name || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">地点名称：</p>
-          <p class="identify-con-value">{{ identifyModel.name || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">省级名称：</p>
-          <p class="identify-con-value">{{ identifyModel.name || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">市级名称：</p>
-          <p class="identify-con-value">{{ identifyModel.name || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">县级名称：</p>
-          <p class="identify-con-value">{{ identifyModel.name || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">乡镇名称：</p>
-          <p class="identify-con-value">{{ identifyModel.name || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">经度：</p>
-          <p class="identify-con-value">{{ identifyModel.lon || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label">纬度：</p>
-          <p class="identify-con-value">{{ identifyModel.lat || "--" }}</p>
-        </div>
-        <div class="con identify-con">
-          <p class="identify-con-label"> {{ identifyModel.jyl ? '降雨量极值' : '格网降雨量'}}</p>
-          <p class="identify-con-value">{{ (identifyModel.max ? identifyModel.max : identifyModel.jyl) + 'mm' || "--" }}</p>
-        </div>
-        <div class="con identify-con identify-operation-con">
-        </div> -->
-      </div>
-    </div>
+    <MapMarkerPopup
+      :visible="popupShow"
+      :model="identifyModel"
+      :lon="identifyModellon"
+      :lat="identifyModellat"
+      @close="closeIdentify"
+    />
     <!-- 案例收藏模块 -->
-    <!-- 查看案例 -->
-    <div class="case-collection-wrapper" v-if="isCaseCollectionSeeShow"
-      style="width: 400px;height: 500px;top: 70px;left: 1060px;">
-      <div class="case-collection-header">
-        <div class="case-collection-title">
-          <img src="../../assets/images/rapidAnalysis/mark.png" alt="" class="title-icon" />
-          <span>收藏夹</span>
-        </div>
-        <div>
-          <a-icon type="fullscreen" class="case-collection-fullscreen" @click="openCaseListDetails" />
-          <a-icon type="close-circle" class="case-collection-close" @click="isCaseCollectionSeeShow = false" />
-        </div>
-      </div>
-      <div class="case-collection-content">
-        <div class="case-list-search-box">
-          <a-input-search v-model="caseSearchValue" allowClear placeholder="请输入关键词" class="case-search-input"
-            @search="getCaseAll" />
-          <a-button type="primary" icon="audit" @click="createCase" class="case-search-btn">
-            创建案例
-          </a-button>
-        </div>
-        <ul class="case-list-box">
-          <li v-for="(item, index) in caseList" :key="index">
-            <span class="case-name" :title="item.case_name">{{ item.case_name }}</span>
-            <span class="see-case-btn" @click="showCaseDetails(item)">查看</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <!-- 选择案例 -->
-    <div class="case-collection-wrapper" style="width: 492px;height: 324px;" v-if="isCaseCollectionSelectShow">
-      <div class="case-collection-header">
-        <div class="case-collection-title">
-          <a-icon type="file-search" class="title-icon" />
-          <span>加入收藏</span>
-        </div>
-        <div>
-          <!-- <a-icon type="fullscreen" class="case-collection-fullscreen" /> -->
-          <a-icon type="close-circle" class="case-collection-close" @click="isCaseCollectionSelectShow = false" />
-        </div>
-      </div>
-      <div class="case-collection-content">
-        <div class="case-collection-item">
-          <div class="label-name">
-            选择案例：
-          </div>
-          <a-select :value="caseSelectValue" style="width: 100%;" placeholder="请选择案例" @change="caseSelectChange">
-            <a-select-option :value="item.case_id" v-for="(item, index) in caseList" :key="index">
-              {{ item.case_name }}
-            </a-select-option>
-          </a-select>
-        </div>
-        <div class="case-collection-tips">
-          没有找到案例？<span class="case-collection-tips-link" @click="createCase">创建新的案例</span>
-        </div>
-        <div class="case-collection-btn-box" style="margin-top: 50px;">
-          <button class="case-collection-btn case-collection-btn-cancel" @click="isCaseCollectionSelectShow = false">
-            取消
-          </button>
-          <button class="case-collection-btn case-collection-btn-confirm" @click="addCaseToCollection">
-            确定
-          </button>
-        </div>
-      </div>
-    </div>
-    <!-- 案例列表放大 -->
-    <div class="case-collection-wrapper-shadow" v-if="isCaseListShow">
-      <div class="case-collection-wrapper case-collection-wrapper-center" style="width: 800px;height: 500px;">
-        <div class="case-collection-header">
-          <div class="case-collection-title">
-            <a-icon type="file-search" class="title-icon" />
-            <span>收藏夹</span>
-          </div>
-          <div>
-            <a-icon type="close-circle" class="case-collection-close" @click="isCaseListShow = false" />
-          </div>
-        </div>
-        <div class="case-collection-content">
-          <div class="case-list-search-box" style="margin-bottom: 20px;">
-            <a-input-search v-model="caseSearchValue" allowClear placeholder="请输入关键词" class="case-search-input"
-              @search="getCaseAll" />
-            <a-button type="primary" icon="audit" @click="createCase" class="case-search-btn">
-              创建案例
-            </a-button>
-          </div>
-          <a-table :columns="caseColumns" :data-source="caseList" :pagination="false" :scroll="{ y: 300 }" size="small">
-            <span slot="num" slot-scope="text, record, index">
-              <span>{{ index + 1 }}</span>
-            </span>
-            <span slot="action" slot-scope="text, record">
-              <a-space>
-                <a class="case-table-action case-table-action-view" @click="showCaseDetails(record)">查看</a>
-                <a class="case-table-action case-table-action-delete" @click="deleteCase(record, '1')">删除</a>
-              </a-space>
-            </span>
-          </a-table>
-        </div>
-      </div>
-    </div>
-    <!-- 查看案例详情收起 -->
-    <div class="case-collection-wrapper" style="width: 270px;height: 40px;"
-      v-if="isCaseCollectionDetailsShow && isCaseCollectionFullscreen">
-      <div class="case-collection-header" style="height: 40px;padding-right: 10px;">
-        <div class="case-collection-title">
-          <a-icon type="file-search" class="title-icon" />
-          <span>查看案例</span>
-        </div>
-        <div>
-          <a-icon type="fullscreen" class="case-collection-fullscreen" @click="showScreenCaseDetails" />
-          <a-icon type="close-circle" class="case-collection-close" @click="closeCaseDetails" />
-        </div>
-      </div>
-    </div>
-    <!-- 查看案例详情 -->
-    <div class="case-collection-wrapper" v-drag-resizable style="width: 530px;height: calc(100vh - 340px);"
-      v-if="isCaseCollectionDetailsShow && !isCaseCollectionFullscreen">
-      <div class="case-collection-header">
-        <div class="case-collection-title">
-          <a-icon type="file-search" class="title-icon" />
-          <span>{{ isNewCaseMode ? "创建案例" : "案例查看" }}</span>
-        </div>
-        <div>
-          <a-icon type="fullscreen-exit" class="case-collection-fullscreen" @click="hideScreenCaseDetails" />
-          <a-icon type="close-circle" class="case-collection-close" @click="closeCaseDetails" />
-        </div>
-      </div>
-      <caseMain :caseId="caseDetailsId" ref="caseMain" @handleSaveCase="handleSaveCase"
-        @caseHistoryTaskClick="caseHistoryTaskClick" @seePrint="seePrint"></caseMain>
-      <div class="case-collection-btn-box">
-        <button class="case-collection-btn case-collection-btn-cancel" @click="closeCaseDetails">
-          取消
-        </button>
-        <button class="case-collection-btn case-collection-btn-confirm" @click="handleSaveCase">
-          保存
-        </button>
-      </div>
-    </div>
-    <!-- 案例收藏模块 -->
+    <CaseCollectionPanels
+      ref="caseCollectionPanels"
+      :seeShow.sync="isCaseCollectionSeeShow"
+      :selectShow.sync="isCaseCollectionSelectShow"
+      :listShow.sync="isCaseListShow"
+      :detailsShow="isCaseCollectionDetailsShow"
+      :fullscreen="isCaseCollectionFullscreen"
+      :caseList="caseList"
+      :searchValue.sync="caseSearchValue"
+      :selectValue="caseSelectValue"
+      :caseDetailsId="caseDetailsId"
+      :isNewCaseMode="isNewCaseMode"
+      @open-list-details="openCaseListDetails"
+      @search="getCaseAll"
+      @create="createCase"
+      @view="showCaseDetails"
+      @select-change="caseSelectChange"
+      @confirm-add="addCaseToCollection"
+      @delete="onCaseDelete"
+      @expand-details="showScreenCaseDetails"
+      @collapse-details="hideScreenCaseDetails"
+      @close-details="closeCaseDetails"
+      @save="handleSaveCase"
+      @history-task="caseHistoryTaskClick"
+      @see-print="seePrint"
+    />
   </div>
 </template>
 
@@ -665,7 +436,6 @@ import geoLocation from "../../components/rapidAnalysis/geoLocation.vue";
 import ResourceMenu from "../../components/rapidAnalysis/resourceMenu.vue";
 import { myMixin } from "./mixin.js";
 import buttonPostion from "../../components/buttonPostion/index.vue";
-import caseMain from "../../components/rapidAnalysis/caseMain.vue";
 import RegionStatusPanel from "../../components/rapidAnalysis/RegionStatusPanel.vue";
 import OlPreviewMap from "../../components/rapidAnalysis/OlPreviewMap.vue";
 import RankingListPanel from "./components/RankingListPanel.vue";
@@ -676,6 +446,10 @@ import DetailChartsPanel from "./components/DetailChartsPanel.vue";
 import WarningScrollBanner from "./components/WarningScrollBanner.vue";
 import TimelineResolutionTabs from "./components/TimelineResolutionTabs.vue";
 import MapLegendPanel from "./components/MapLegendPanel.vue";
+import TaskListPanel from "./components/TaskListPanel.vue";
+import MapMarkerPopup from "./components/MapMarkerPopup.vue";
+import MapToolbarShell from "./components/MapToolbarShell.vue";
+import CaseCollectionPanels from "./components/CaseCollectionPanels.vue";
 import { DISASTER_INDEX_MAP } from "@/domain/region/constants";
 import {
   tryGetMapFacade,
@@ -789,38 +563,6 @@ const nlColumns = [
 
 const nlData = [];
 
-const caseColumns = [
-  {
-    title: "序号",
-    width: 80,
-    align: "center",
-    scopedSlots: { customRender: "num" }
-  },
-  {
-    title: "案例名称",
-    key: "case_name",
-    dataIndex: "case_name"
-  },
-  {
-    title: "灾害过程日期",
-    dataIndex: "zhgcrq",
-    key: "zhgcrq"
-  },
-  {
-    title: "受灾区域",
-    dataIndex: "xzqmc",
-    key: "xzqmc",
-    ellipsis: true,
-    width: 250
-  },
-  {
-    title: "操作",
-    key: "action",
-    width: 120,
-    scopedSlots: { customRender: "action" }
-  }
-];
-
 // 短临降水图例
 export default {
   name: "rapidAnalysis",
@@ -834,7 +576,6 @@ export default {
     Identify,
     buttonPostion,
     openLayerList,
-    caseMain,
     RegionStatusPanel,
     OlPreviewMap,
     RankingListPanel,
@@ -844,7 +585,11 @@ export default {
     DetailChartsPanel,
     WarningScrollBanner,
     TimelineResolutionTabs,
-    MapLegendPanel
+    MapLegendPanel,
+    TaskListPanel,
+    MapMarkerPopup,
+    MapToolbarShell,
+    CaseCollectionPanels
   },
   provide: function () {
     //依赖注入
@@ -1132,7 +877,6 @@ export default {
       coordinatePoint: {}, // 点位经纬度
       caseTaskId: "",
       singleCollectType: "",
-      caseColumns,
       isCaseListShow: false,
       isNowTime: true,
       isJcsbLegendShow: false,
@@ -1320,7 +1064,7 @@ export default {
             datatime: item.datatime,
             xzqdm: item.xzqdm
           };
-          diitgis.addMarker([item.x, item.y], item.iconUrl, obj, 'yjdj');
+          this.addMarkerViaFacade([item.x, item.y], item.iconUrl, obj, "yjdj");
         });
       }
     },
@@ -1568,6 +1312,43 @@ export default {
         return true;
       }
       return false;
+    },
+    /** 经 MapFacade 叠加业务点标记（失败回退 diitgis） */
+    addMarkerViaFacade(coordinate, imgUrl, data, type) {
+      const facade = tryGetMapFacade();
+      if (facade && typeof facade.addMarker === "function") {
+        const ok = facade.addMarker(coordinate, imgUrl, data, type);
+        if (ok !== false) return true;
+      }
+      if (typeof diitgis !== "undefined" && diitgis.addMarker) {
+        diitgis.addMarker(coordinate, imgUrl, data || {}, type);
+        return true;
+      }
+      return false;
+    },
+    /** 案例详情子组件 caseMain 引用 */
+    getCaseMainRef() {
+      const panel = this.$refs.caseCollectionPanels;
+      if (panel && typeof panel.getCaseMain === "function") {
+        return panel.getCaseMain();
+      }
+      return (panel && panel.$refs && panel.$refs.caseMain) || null;
+    },
+    onCaseDelete(item, type) {
+      this.deleteCase(item, type);
+    },
+    /** 经 MapFacade 清除业务 marker */
+    clearMarkersViaFacade() {
+      const facade = tryGetMapFacade();
+      if (facade && typeof facade.clearMarkers === "function") {
+        const ok = facade.clearMarkers();
+        if (ok !== false) return true;
+      }
+      const markerClass = document.getElementsByClassName("marker_class");
+      Array.from(markerClass).forEach(function(marker) {
+        marker.remove();
+      });
+      return true;
     },
     /** 经 MapFacade 清空业务图层（失败时回退 earthMap） */
     clearBusinessLayersViaFacade() {
@@ -4886,7 +4667,7 @@ export default {
               type: "byyj"
             });
             if (type != "colorImg") {
-              diitgis.addMarker([item.x, item.y], iconUrl, obj, "byyj");
+              this.addMarkerViaFacade([item.x, item.y], iconUrl, obj, "byyj");
             }
           });
           // this.getByyjcsSJZ();
@@ -5468,7 +5249,7 @@ export default {
             max: item.maxjsl
           };
           let iconUrl = require("../../assets/images/rapidAnalysis/skjyXzIcon.png");
-          diitgis.addMarker([item.x, item.y], iconUrl, obj, "skjyXz");
+          this.addMarkerViaFacade([item.x, item.y], iconUrl, obj, "skjyXz");
         }
       });
     },
@@ -5672,10 +5453,7 @@ export default {
     },
     // 清除地图点位
     removeMapAllMaker() {
-      //获取所有marker_class的class然后清除掉
-      const marker_class = document.getElementsByClassName("marker_class");
-      const markersArray = Array.from(marker_class);
-      markersArray.forEach(marker => marker.remove());
+      this.clearMarkersViaFacade();
     },
     timeTabActiveType(index) {
       this.timeTabActive = index;
@@ -5801,7 +5579,8 @@ export default {
       }).then(res => {
         if (res.code === 200) {
           this.$message.success("收藏成功");
-          this.$refs.caseMain.getCaseInfoData();
+          const caseMain = this.getCaseMainRef();
+          if (caseMain) caseMain.getCaseInfoData();
         } else {
           this.$message.error("收藏失败");
         }
@@ -5816,8 +5595,8 @@ export default {
       this.isCaseCollectionFullscreen = false;
       this.isCaseListShow = false;
       this.$nextTick(() => {
-        if (this.$refs.caseMain) {
-          this.$refs.caseMain.resetCaseForm();
+        if (this.getCaseMainRef()) {
+          this.getCaseMainRef().resetCaseForm();
         }
       });
       this.getSaveCase_other();
@@ -5851,7 +5630,7 @@ export default {
         this.isCaseCollectionDetailsShow &&
         !this.isCaseCollectionFullscreen
       ) {
-        // this.$refs.caseMain.getCaseInfoData();
+        // this.getCaseMainRef().getCaseInfoData();
         this.addCaseToCollection();
       } else {
         this.caseSelectValue = undefined;
@@ -5868,7 +5647,8 @@ export default {
       }).then(res => {
         if (res.code === 200) {
           this.$message.success("收藏成功");
-          this.$refs.caseMain.getCaseInfoData();
+          const caseMain = this.getCaseMainRef();
+          if (caseMain) caseMain.getCaseInfoData();
         } else {
           this.$message.error("收藏失败");
         }
@@ -5894,11 +5674,16 @@ export default {
       this.isCaseListShow = false;
     },
     handleSaveCase(type) {
-      const form = this.$refs.caseMain.form;
-      const print = this.$refs.caseMain.dwTableData;
-      const history = this.$refs.caseMain.historyCaseList;
-      const cityData = this.$refs.caseMain.cityData;
-      const dataList = this.$refs.caseMain.dataList;
+      const caseMain = this.getCaseMainRef();
+      if (!caseMain) {
+        this.$message.error("案例详情未就绪");
+        return;
+      }
+      const form = caseMain.form;
+      const print = caseMain.dwTableData;
+      const history = caseMain.historyCaseList;
+      const cityData = caseMain.cityData;
+      const dataList = caseMain.dataList;
       let kssj = "";
       let jssj = "";
       if (form.date[0] && form.date[1]) {
@@ -5934,7 +5719,8 @@ export default {
             }
             this.$message.success("保存成功");
             this.getCaseAll();
-            this.$refs.caseMain.getCaseInfoData(res.data);
+            const caseMainRef = this.getCaseMainRef();
+            if (caseMainRef) caseMainRef.getCaseInfoData(res.data);
           } else {
             this.$message.error("保存失败");
           }
@@ -5971,7 +5757,7 @@ export default {
         }
       });
 
-      // this.$refs.caseMain.deleteCase(item,tyoe);
+      // this.getCaseMainRef().deleteCase(item,tyoe);
     },
     caseHistoryTaskClick(item) {
       // this.isNowTime = false;

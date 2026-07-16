@@ -316,6 +316,33 @@ export default class LegacyMapAdapter {
     return false;
   }
 
+  /**
+   * 业务点标记（预警城市 / 排行下钻等，封装 diitgis.addMarker）
+   */
+  addMarker(coordinate, imgUrl, data, type) {
+    if (
+      typeof window !== "undefined" &&
+      window.diitgis &&
+      typeof window.diitgis.addMarker === "function"
+    ) {
+      return window.diitgis.addMarker(coordinate, imgUrl, data || {}, type);
+    }
+    if (typeof diitgis !== "undefined" && typeof diitgis.addMarker === "function") {
+      return diitgis.addMarker(coordinate, imgUrl, data || {}, type);
+    }
+    return false;
+  }
+
+  /** 清除业务 marker DOM（与页面 removeMapAllMaker 一致） */
+  clearMarkers() {
+    if (typeof document === "undefined") return false;
+    const markerClass = document.getElementsByClassName("marker_class");
+    Array.from(markerClass).forEach(function(marker) {
+      marker.remove();
+    });
+    return true;
+  }
+
   /** 定位到点并设置缩放 */
   centerOnPoint(lon, lat, zoom) {
     const host = this._getMapHost();

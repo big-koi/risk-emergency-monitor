@@ -49,7 +49,7 @@
         </button>
       </div>
       <div class="region-status-tip">
-        图例已拆；addImage/定位经 Facade；统计 option 模块化
+        案例收藏/工具条已拆；见第 11 批
       </div>
     </div>
   </div>

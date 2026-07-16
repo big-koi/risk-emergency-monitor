@@ -121,6 +121,24 @@ export default class MapFacade {
     return false;
   }
 
+  /** 业务点标记（预警城市 / 排行下钻等） */
+  addMarker(coordinate, imgUrl, data, type) {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.addMarker === "function") {
+      return adapter.addMarker(coordinate, imgUrl, data, type);
+    }
+    return false;
+  }
+
+  /** 清除业务 marker */
+  clearMarkers() {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.clearMarkers === "function") {
+      return adapter.clearMarkers();
+    }
+    return false;
+  }
+
   /** 地图定位到点 */
   centerOnPoint(lon, lat, zoom) {
     const adapter = this._ensureAdapter();

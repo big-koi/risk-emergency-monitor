@@ -1,56 +1,51 @@
 # 重构进度记录
 
 > 对照文档：`FRONTEND_REFACTOR_PLAN.md`  
-> 更新日期：2026-07-15（第 9 批）
+> 更新日期：2026-07-16（第 11 批）
 
-## 本批交付（第 9 批 · 可见效果）
+## 本批交付（第 11 批 · 可见效果）
 
-图例面板拆为独立组件；`addImage` / 工具栏定位 / 地图定点迁入 MapFacade；右侧统计图 option 抽到 charts 模块。
+案例收藏相关 UI（列表 / 加入收藏 / 放大表 / 详情）拆为 `CaseCollectionPanels`；地图工具条拆为 `MapToolbarShell`（行政区、任务列表以 slot 注入）。父页经 `getCaseMainRef()` 访问内嵌 `caseMain`。
 
 ### 如何验收（刷新 http://localhost:8100）
 
-1. 左下角提示：`图例已拆；addImage/定位经 Facade；统计 option 模块化`
-2. 右下图例：短临/实况色带、内涝预警等级与积水深、勾选显隐仍正常
-3. 预警定位图标点击后地图定位与标记正常
-4. 实况 / 内涝栅格叠图正常（仍走 Facade→diitgis）
-5. 右侧降水/积水统计图正常
+1. 左下角提示：`案例收藏/工具条已拆；见第 11 批`
+2. 地图右上工具条：点位查询、基础图层、收藏夹、任务列表按钮正常
+3. 收藏夹：打开列表、搜索、创建案例、查看详情、保存/删除与重构前一致
+4. 任务列表面板仍挂在工具条 slot 中，交互不变
 
 ### 进度表
 
 | 计划阶段 | 状态 | 说明 |
 |---------|------|------|
-| 阶段 3/4 MapFacade | **加深** | addImageLayer / addToolbarMarker / centerOnPoint |
-| 阶段 7 UI 拆分 | **推进** | + MapLegendPanel |
-| 阶段 8 灾种模块 | **推进** | + sumChartOptions |
+| 阶段 3/4 MapFacade | 延续 | 第 10 批 addMarker |
+| 阶段 7 UI 拆分 | **推进** | + CaseCollectionPanels、MapToolbarShell |
+| 阶段 8 灾种模块 | 延续 | 短临逻辑仍在 index |
 
 ### 关键改动
 
 ```text
-src/views/rapidAnalysis/components/MapLegendPanel.vue
-src/views/rapidAnalysis/modules/charts/sumChartOptions.js
-src/map/adapters/LegacyMapAdapter.js
-src/map/core/MapFacade.js
+src/views/rapidAnalysis/components/CaseCollectionPanels.vue
+src/views/rapidAnalysis/components/MapToolbarShell.vue
 src/views/rapidAnalysis/index.vue
-  - 图例 → MapLegendPanel
-  - addImageLayerViaFacade / addLocateMarker / centerMapOnPoint
-src/views/rapidAnalysis/components/StatisticsChartPanel.vue
+  - 工具条 → MapToolbarShell（slot: region / task-list）
+  - 案例 UI → CaseCollectionPanels
+  - getCaseMainRef() / onCaseDelete()
 ```
 
 ### 本批不做
 
-- 未迁全部 `diitgis.addMarker` / `me.earth.createLayer`
+- 未拆 Identify / 基础图层本体
+- 未改案例业务 API 与 `caseMain` 内部逻辑
 - 主地图未切 OpenLayers
-- 未删 regionContext
 
 ## 下一批建议
 
-1. 封装 `addMarker` 系列进 Facade，压缩预警城市打点。
-2. 拆任务列表 / 地图点位弹窗组件。
-3. 短临 cacheLayers 的 `me.earth.layerManager` 收敛到适配器。
-4. 继续对照 `VITE_VUE3_PRECHECK.md` 推进瘦身。
+1. 拆基础图层 / Identify 查询面板轻量封装。
+2. 短临 cacheLayers 收敛到 MapFacade / modules。
+3. 继续对照 `VITE_VUE3_PRECHECK.md` 瘦身 `index.vue`。
 
 ## 回滚
 
-1. MapLegendPanel 模板可贴回 index.vue。
-2. `addImageLayerViaFacade` 改回直接 `diitgis.addImage`。
-3. StatisticsChartPanel 可恢复内联 buildOption。
+1. CaseCollectionPanels / MapToolbarShell 模板可贴回 index.vue。
+2. `this.getCaseMainRef()` 改回 `this.$refs.caseMain`（需同步恢复 caseMain 直挂父页）。

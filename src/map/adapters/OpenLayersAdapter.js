@@ -312,6 +312,15 @@ export default class OpenLayersAdapter {
     Object.keys(this._layers).forEach(id => this.removeLayer(id));
   }
 
+  /** OL 预览期：业务 marker 尚未统一实现 */
+  addMarker() {
+    return false;
+  }
+
+  clearMarkers() {
+    return false;
+  }
+
   clearHighlight() {
     this.removeLayer(BOUNDARY_LAYER_ID);
   }
