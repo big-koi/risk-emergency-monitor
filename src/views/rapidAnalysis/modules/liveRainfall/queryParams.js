@@ -2,6 +2,21 @@
  * 实况降雨领域：查询参数与列表适配
  */
 
+/** 全国实况降雨 PNG 默认四至 */
+export const LIVE_PNG_IMAGE_EXTENT = [69.995, -0.005, 140.005, 60.005];
+
+export const LIVE_RAIN_LAYER_NAME = "实况降雨图层";
+
+/** 实况排行钻取详情参数 */
+export function buildLiveDrillParams(options) {
+  const opts = options || {};
+  return {
+    skTime: opts.taskTime,
+    skType: opts.liveRainType || "6",
+    xzqdm: opts.xzqdm || ""
+  };
+}
+
 export function buildLiveRainRankParams(options) {
   const opts = options || {};
   const skTime =
@@ -45,6 +60,9 @@ export function adaptLiveRainRankItem(item) {
 }
 
 export default {
+  LIVE_PNG_IMAGE_EXTENT,
+  LIVE_RAIN_LAYER_NAME,
+  buildLiveDrillParams,
   buildLiveRainRankParams,
   buildLivePngParams,
   adaptLiveRainRankItem

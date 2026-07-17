@@ -49,7 +49,7 @@
         </button>
       </div>
       <div class="region-status-tip">
-        案例收藏/工具条已拆；见第 11 批
+        跨模块区划/定位变更已抽模块；见第 26 批
       </div>
     </div>
   </div>

@@ -56,6 +56,29 @@ export default class MapFacade {
     return this._ensureAdapter().zoomToExtent(extent);
   }
 
+  /**
+   * 按四至 fit（支持 padding / maxZoom / duration）
+   */
+  fitExtent(extent, options) {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.fitExtent === "function") {
+      return adapter.fitExtent(extent, options);
+    }
+    if (extent && extent.length === 4) {
+      return this.zoomToExtent(extent);
+    }
+    return false;
+  }
+
+  /** 当前视图投影代号 */
+  getViewProjectionCode() {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.getViewProjectionCode === "function") {
+      return adapter.getViewProjectionCode();
+    }
+    return null;
+  }
+
   goNationalView() {
     const adapter = this._ensureAdapter();
     if (typeof adapter.goNationalView === "function") {
@@ -78,6 +101,17 @@ export default class MapFacade {
     const adapter = this._ensureAdapter();
     if (typeof adapter.highlightBoundary === "function") {
       return adapter.highlightBoundary(data, options);
+    }
+    return false;
+  }
+
+  /**
+   * 叠加行政区橙色轮廓（原 upladeLine）
+   */
+  addAdminOutline(features, options) {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.addAdminOutline === "function") {
+      return adapter.addAdminOutline(features, options);
     }
     return false;
   }
@@ -112,6 +146,34 @@ export default class MapFacade {
     return false;
   }
 
+  /**
+   * 创建栅格图层（短临 cacheLayers / 极值图等）
+   * @returns {Object|null}
+   */
+  createImageLayer(layerName, type, url, options) {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.createImageLayer === "function") {
+      return adapter.createImageLayer(layerName, type, url, options);
+    }
+    return null;
+  }
+
+  addHostLayer(layer) {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.addHostLayer === "function") {
+      return adapter.addHostLayer(layer);
+    }
+    return false;
+  }
+
+  removeHostLayer(layer) {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.removeHostLayer === "function") {
+      return adapter.removeHostLayer(layer);
+    }
+    return false;
+  }
+
   /** 工具栏定位 marker */
   addToolbarMarker(coordinate, imgUrl, data) {
     const adapter = this._ensureAdapter();
@@ -126,6 +188,15 @@ export default class MapFacade {
     const adapter = this._ensureAdapter();
     if (typeof adapter.addMarker === "function") {
       return adapter.addMarker(coordinate, imgUrl, data, type);
+    }
+    return false;
+  }
+
+  /** 气象台预警点 marker */
+  addQxjMarker(coordinate, imgUrl, data, type) {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.addQxjMarker === "function") {
+      return adapter.addQxjMarker(coordinate, imgUrl, data, type);
     }
     return false;
   }
@@ -154,6 +225,15 @@ export default class MapFacade {
     if (typeof adapter.clearHighlight === "function") {
       return adapter.clearHighlight();
     }
+  }
+
+  /** 按 id 移除地图图层（行政区轮廓 / 高亮等） */
+  removeMapLayersByIds(idArray) {
+    const adapter = this._ensureAdapter();
+    if (typeof adapter.removeMapLayersByIds === "function") {
+      return adapter.removeMapLayersByIds(idArray);
+    }
+    return false;
   }
 
   setLayerVisible(layerId, visible) {

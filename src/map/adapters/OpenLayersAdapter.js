@@ -124,6 +124,34 @@ export default class OpenLayersAdapter {
     }
   }
 
+  fitExtent(extent, options) {
+    if (!this._map || !extent || extent.length !== 4) {
+      return false;
+    }
+    const opts = options || {};
+    try {
+      this._map.getView().fit(extent, {
+        size: opts.size || this._map.getSize(),
+        padding: opts.padding || [60, 60, 60, 60],
+        maxZoom: opts.maxZoom,
+        duration: opts.duration != null ? opts.duration : 300
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  getViewProjectionCode() {
+    if (!this._map) return null;
+    try {
+      const proj = this._map.getView().getProjection();
+      return (proj && proj.getCode && proj.getCode()) || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   goNationalView() {
     if (!this._map) return;
     this.removeLayer(BOUNDARY_LAYER_ID);
@@ -317,12 +345,55 @@ export default class OpenLayersAdapter {
     return false;
   }
 
+  addQxjMarker() {
+    return false;
+  }
+
   clearMarkers() {
+    return false;
+  }
+
+  createImageLayer() {
+    return null;
+  }
+
+  addHostLayer() {
+    return false;
+  }
+
+  removeHostLayer() {
+    return false;
+  }
+
+  addAdminOutline() {
     return false;
   }
 
   clearHighlight() {
     this.removeLayer(BOUNDARY_LAYER_ID);
+  }
+
+  removeMapLayersByIds(idArray) {
+    if (!idArray || !idArray.length || !this._map) {
+      return false;
+    }
+    const ids = idArray.slice();
+    this._map
+      .getLayers()
+      .getArray()
+      .filter(function(l) {
+        const lid = l.get && l.get("id");
+        return ids.indexOf(lid) !== -1;
+      })
+      .forEach(lyr => {
+        this._map.removeLayer(lyr);
+      });
+    ids.forEach(id => {
+      if (this._layers[id]) {
+        delete this._layers[id];
+      }
+    });
+    return true;
   }
 
   setLayerVisible(layerId, visible) {

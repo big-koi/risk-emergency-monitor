@@ -81,6 +81,56 @@ export default class LegacyMapAdapter {
     }
   }
 
+  /**
+   * 按四至 fit（padding / maxZoom / duration）
+   * @param {number[]} extent [minX,minY,maxX,maxY]
+   */
+  fitExtent(extent, options) {
+    if (!extent || extent.length !== 4) {
+      return false;
+    }
+    const opts = options || {};
+    const host = this._getMapHost();
+    const earth = this._getEarth();
+    const map = (host && host.map) || (earth && earth.map);
+    if (!map || typeof map.getView !== "function") {
+      return false;
+    }
+    try {
+      const fitOpts = {
+        padding: opts.padding || [60, 60, 60, 60],
+        duration: opts.duration != null ? opts.duration : 300
+      };
+      if (opts.size) {
+        fitOpts.size = opts.size;
+      } else if (typeof map.getSize === "function") {
+        fitOpts.size = map.getSize();
+      }
+      if (opts.maxZoom != null) {
+        fitOpts.maxZoom = opts.maxZoom;
+      }
+      map.getView().fit(extent, fitOpts);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /** 当前视图投影代号，如 EPSG:4490 */
+  getViewProjectionCode() {
+    try {
+      const host = this._getMapHost();
+      const earth = this._getEarth();
+      const map = (host && host.map) || (earth && earth.map);
+      const view = map && map.getView && map.getView();
+      const proj = view && view.getProjection && view.getProjection();
+      const code = proj && proj.getCode && proj.getCode();
+      return code || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   /** 回到全国默认视野（与旧 clearAdminRegionMapDisplay 一致） */
   goNationalView() {
     this.setZoom(5);
@@ -297,6 +347,92 @@ export default class LegacyMapAdapter {
   }
 
   /**
+   * 创建栅格 Image 图层（封装 layerManager.createLayer type=8）
+   * @returns {Object|null} 图层实例
+   */
+  createImageLayer(layerName, type, url, options) {
+    const lm = this._getLayerManager();
+    if (!lm || typeof lm.createLayer !== "function") {
+      return null;
+    }
+    return lm.createLayer(layerName, type != null ? type : 8, url, options || {});
+  }
+
+  /** 判断业务图层是否已挂在 OL 地图上（避免重复 addLayer 触发 OL #58） */
+  _isHostLayerOnMap(layer) {
+    if (!layer) return false;
+    const host = this._getMapHost();
+    const olMap = host && host.map;
+    if (!olMap || typeof olMap.getLayers !== "function") {
+      return false;
+    }
+    const olLayer =
+      typeof layer.getLayer === "function" ? layer.getLayer() : layer;
+    if (!olLayer) return false;
+    return olMap
+      .getLayers()
+      .getArray()
+      .some(function(lyr) {
+        return lyr === olLayer;
+      });
+  }
+
+  /** 将图层挂到地图宿主（已挂载则跳过，幂等） */
+  addHostLayer(layer) {
+    if (!layer) return false;
+    if (this._isHostLayerOnMap(layer)) {
+      return true;
+    }
+    const host = this._getMapHost();
+    if (host && typeof host.addLayer === "function") {
+      try {
+        host.addLayer(layer);
+        return true;
+      } catch (e) {
+        if (this._isHostLayerOnMap(layer)) {
+          return true;
+        }
+      }
+    }
+    const earth = this._getEarth();
+    if (earth && typeof earth.addLayer === "function") {
+      try {
+        earth.addLayer(layer);
+        return true;
+      } catch (e) {
+        if (this._isHostLayerOnMap(layer)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /** 从地图宿主移除图层 */
+  removeHostLayer(layer) {
+    if (!layer) return false;
+    const host = this._getMapHost();
+    if (host && typeof host.removeLayer === "function") {
+      try {
+        host.removeLayer(layer);
+        return true;
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    const earth = this._getEarth();
+    if (earth && typeof earth.removeLayer === "function") {
+      try {
+        earth.removeLayer(layer);
+        return true;
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    return false;
+  }
+
+  /**
    * 工具栏定位点 marker（封装 diitgis.addToobarrMarker）
    */
   addToolbarMarker(coordinate, imgUrl, data) {
@@ -333,6 +469,31 @@ export default class LegacyMapAdapter {
     return false;
   }
 
+  /**
+   * 气象台预警点（封装 diitgis.addqxjMarker）
+   */
+  addQxjMarker(coordinate, imgUrl, data, type) {
+    if (
+      typeof window !== "undefined" &&
+      window.diitgis &&
+      typeof window.diitgis.addqxjMarker === "function"
+    ) {
+      return window.diitgis.addqxjMarker(
+        coordinate,
+        imgUrl,
+        data || {},
+        type
+      );
+    }
+    if (
+      typeof diitgis !== "undefined" &&
+      typeof diitgis.addqxjMarker === "function"
+    ) {
+      return diitgis.addqxjMarker(coordinate, imgUrl, data || {}, type);
+    }
+    return false;
+  }
+
   /** 清除业务 marker DOM（与页面 removeMapAllMaker 一致） */
   clearMarkers() {
     if (typeof document === "undefined") return false;
@@ -363,6 +524,36 @@ export default class LegacyMapAdapter {
     if (lm && typeof lm.clearHightLayer === "function") {
       return lm.clearHightLayer();
     }
+  }
+
+  /**
+   * 按 id 移除 OL 地图上的矢量/缓冲图层（原 removeBufferLayer）
+   */
+  removeMapLayersByIds(idArray) {
+    if (!idArray || !idArray.length) {
+      return false;
+    }
+    const host = this._getMapHost();
+    const map = host && host.map;
+    if (!map || typeof map.getLayers !== "function") {
+      return false;
+    }
+    const ids = idArray;
+    map
+      .getLayers()
+      .getArray()
+      .filter(function(l) {
+        const lid = l.get && l.get("id");
+        const props = l.getProperties && l.getProperties();
+        const pid = props && props.id;
+        return ids.some(function(itemId) {
+          return lid === itemId || pid === itemId;
+        });
+      })
+      .forEach(function(lyr) {
+        map.removeLayer(lyr);
+      });
+    return true;
   }
 
   setLayerVisible(layerId, visible) {
