@@ -49,7 +49,7 @@
         </button>
       </div>
       <div class="region-status-tip">
-        跨模块区划/定位变更已抽模块；见第 26 批
+        任务列表后续加载已抽模块；见第 29 批
       </div>
     </div>
   </div>

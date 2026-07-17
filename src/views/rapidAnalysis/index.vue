@@ -467,7 +467,12 @@ import {
   resolveFloodQueryXzqdm,
   resolveFloodMapXzqdm,
   planAdoptCrossModuleRegion,
-  planPositionXzqCodeChange
+  planPositionXzqCodeChange,
+  mergeRegionContextState,
+  shouldShadowSyncBrowseStore,
+  resolveRegionButtonLabelFromSources,
+  resolveRegionDisplayLabelFromSources,
+  buildToolbarRegionPayload
 } from "./modules/regionSession";
 import { TreeSelect } from "ant-design-vue";
 const SHOW_PARENT = TreeSelect.SHOW_PARENT;
@@ -572,10 +577,21 @@ import {
 } from "./modules/warnings";
 import {
   resolveTaskTypeForModule,
-  resolveModuleUiMeta,
   resolveTaskSelectedTime,
-  resolvePostTaskLoadPlan,
-  shouldHandleEmptyTaskCrossModuleDrill
+  planRefreshFloodModuleData,
+  planRefreshBrowseAfterRegionChange,
+  planRefreshListAfterExitDetail,
+  planModuleSwitchRegionPrep,
+  planModuleSwitchPending,
+  planModuleSwitchBoundary,
+  planModuleSwitchLoad,
+  resolveFloodRankColumns,
+  resolveShortTermRankColumnsOnSwitch,
+  shouldSearchQxtYjOnSwitch,
+  planModuleSwitchCleanup,
+  buildTaskListUiResetFlags,
+  planEmptyTaskListResult,
+  buildPostTaskLoadExecution
 } from "./modules/taskSession";
 import {
   buildByDetailChartOption,
@@ -1187,13 +1203,17 @@ export default {
     },
     /** 同步行政区上下文到工具栏（单一数据源入口） */
     applyRegionContext(partial, options = {}) {
-      const { silent = false, skipButtonSync = false, skipBoundary = false, skipStore = false } = options;
-      const next = Object.assign({}, this.regionContext, partial);
+      const {
+        silent = false,
+        skipButtonSync = false,
+        skipBoundary = false,
+        skipStore = false
+      } = options;
+      const next = mergeRegionContextState(this.regionContext, partial);
       this.regionContext = next;
       this.positionXzqCode = getQueryCode(next);
 
-      // 重构：浏览态写入时影子同步到 Region Store，减少双源漂移
-      if (!skipStore && next.mode !== REGION_MODE.DRILL) {
+      if (shouldShadowSyncBrowseStore(next, skipStore)) {
         this.syncRegionStoreBrowse(
           normalizeBrowseStoreCode(next.code),
           next.label || "全国"
@@ -1201,108 +1221,43 @@ export default {
       }
 
       if (!skipButtonSync && this.$refs.buttonPostion) {
-        const lock =
-          next.mode === REGION_MODE.DRILL && next.lockMinCode
-            ? {
-                minCode: next.lockMinCode,
-                minLevel: next.lockMinLevel
-              }
-            : null;
-        const btnCode = next.code ? String(next.code).trim() : "";
-        const btnHasCode = btnCode && btnCode !== "100000";
-        let btnLabel = next.label || "";
-        if (btnHasCode && !btnLabel) {
-          btnLabel = this.resolveRegionButtonLabel(next);
-        }
-        if (btnHasCode && (!btnLabel || btnLabel === "全国")) {
-          btnLabel = this.resolveRegionDisplayLabel(btnCode);
-        }
-        this.$refs.buttonPostion.applyRegionContext({
-          code: btnHasCode ? btnCode : "100000",
-          label: btnHasCode ? btnLabel || btnCode : "全国",
-          lock,
-          silent,
-          skipBoundary
-        });
+        this.$refs.buttonPostion.applyRegionContext(
+          buildToolbarRegionPayload(next, {
+            silent: silent,
+            skipBoundary: skipBoundary,
+            resolveButtonLabel: ctx => this.resolveRegionButtonLabel(ctx),
+            resolveDisplayLabel: code => this.resolveRegionDisplayLabel(code)
+          })
+        );
       }
     },
     /** 解析工具栏展示名称（下钻后 label 可能为空） */
     resolveRegionButtonLabel(ctx) {
-      if (ctx && ctx.label && ctx.label !== "全国") {
-        return ctx.label;
-      }
-      if (
-        (this.disasterTypeIndex === 3 || this.disasterTypeIndex === 4) &&
-        ctx &&
-        ctx.code
-      ) {
-        const ref = this.$refs.buttonPostion;
-        if (ref && ref.locationName && ref.locationName !== "全国") {
-          return ref.locationName;
-        }
-      }
-      const obj = this.tableDirllObj;
-      if (obj && typeof obj === "object" && Object.keys(obj).length) {
-        if (obj.shengname && !obj.shiname) {
-          return obj.shengname;
-        }
-        if (obj.shiname && obj.shengname) {
-          return obj.shengname + obj.shiname;
-        }
-        if (obj.shiname) {
-          return obj.shiname;
-        }
-        if (obj.name) {
-          return obj.name;
-        }
-      }
-      if (this.detailsTitleXzqh) {
-        return this.detailsTitleXzqh;
-      }
       const ref = this.$refs.buttonPostion;
-      if (ref && ref.locationName && ref.locationName !== "全国") {
-        return ref.locationName;
-      }
       const parts = this.getWarningRegionParts();
-      if (parts.regionLabel && parts.regionLabel !== "全国") {
-        return parts.regionLabel;
-      }
-      return "";
+      return resolveRegionButtonLabelFromSources({
+        ctx: ctx,
+        isFloodModule:
+          this.disasterTypeIndex === 3 || this.disasterTypeIndex === 4,
+        locationName: ref && ref.locationName,
+        tableDirllObj: this.tableDirllObj,
+        detailsTitleXzqh: this.detailsTitleXzqh,
+        partsRegionLabel: parts && parts.regionLabel
+      });
     },
     /** 模块切换/同步工具栏时解析展示名称（多源兜底） */
     resolveRegionDisplayLabel(code) {
       const codeStr = code ? String(code).trim() : "";
-      if (!codeStr || codeStr === "100000") {
-        return "全国";
-      }
       const ctx = Object.assign({}, this.regionContext, {
         code: codeStr,
         warningCode: codeStr
       });
-      if (ctx.label && ctx.label !== "全国") {
-        return ctx.label;
-      }
-      let label = this.resolveRegionButtonLabel(ctx);
-      if (label && label !== "全国") {
-        return label;
-      }
-      const parts = this.getWarningRegionParts();
-      if (parts.provinceName && parts.cityName && parts.countyName) {
-        return `${parts.provinceName}${parts.cityName}${parts.countyName}`;
-      }
-      if (parts.provinceName && parts.cityName) {
-        return `${parts.provinceName}${parts.cityName}`;
-      }
-      if (parts.provinceName) {
-        return parts.provinceName;
-      }
-      if (parts.regionLabel && parts.regionLabel !== "全国") {
-        return parts.regionLabel;
-      }
-      if (ctx.label && ctx.label !== "全国") {
-        return ctx.label;
-      }
-      return "";
+      return resolveRegionDisplayLabelFromSources({
+        code: codeStr,
+        ctxLabel: ctx.label,
+        buttonLabel: this.resolveRegionButtonLabel(ctx),
+        parts: this.getWarningRegionParts()
+      });
     },
     resetRegionToNational(options = {}) {
       const { silent = false, skipMapClear = false } = options;
@@ -2053,23 +2008,16 @@ export default {
       }
     },
     refreshCurrentFloodModuleData() {
-      if (this.disasterTypeIndex === 3) {
-        if (this.csnlValue == 1) {
-          this.getNlyjcsData();
-          this.getJssdData();
-        } else {
-          this.getJsGqthreeData();
-          this.getNlyjcsGqThreeData();
+      const plan = planRefreshFloodModuleData({
+        disasterTypeIndex: this.disasterTypeIndex,
+        csnlValue: this.csnlValue,
+        shValue: this.shValue
+      });
+      (plan.actions || []).forEach(name => {
+        if (typeof this[name] === "function") {
+          this[name]();
         }
-      } else if (this.disasterTypeIndex === 4) {
-        if (this.shValue == 1) {
-          this.getshyjcsData();
-          this.getshJssdData();
-        } else {
-          this.getshYjGqData();
-          this.getShGqthreeData();
-        }
-      }
+      });
     },
     getPositionXzqCode(xzqdm) {
       this.clearRainfallCenterLocate();
@@ -2157,45 +2105,55 @@ export default {
     },
     /** 行政区切换后刷新当前模块浏览数据 */
     refreshBrowseDataAfterRegionChange() {
-      if (this.disasterTypeIndex === 1) {
-        this.getJsData();
-      } else if (this.disasterTypeIndex === 2) {
-        this.getSkJsData();
-      } else if (
-        (this.disasterTypeIndex === 3 || this.disasterTypeIndex === 4) &&
-        !this.isJsDetailsChart
-      ) {
-        this.floodCrossDrillNoData = false;
-        this.pendingCrossModuleFloodDrill = this.buildPendingFloodRegion();
-        this.refreshCurrentFloodModuleData();
-      }
-      this.fetchCurrentModuleWarningInfo();
+      const plan = planRefreshBrowseAfterRegionChange({
+        disasterTypeIndex: this.disasterTypeIndex,
+        isJsDetailsChart: this.isJsDetailsChart
+      });
+      (plan.actions || []).forEach(action => {
+        if (action === "getJsData") {
+          this.getJsData();
+        } else if (action === "getSkJsData") {
+          this.getSkJsData();
+        } else if (action === "resetFloodCrossDrill") {
+          this.floodCrossDrillNoData = false;
+        } else if (action === "setPendingFloodRegion") {
+          this.pendingCrossModuleFloodDrill = this.buildPendingFloodRegion();
+        } else if (action === "refreshFloodModule") {
+          this.refreshCurrentFloodModuleData();
+        } else if (action === "fetchWarning") {
+          this.fetchCurrentModuleWarningInfo();
+        }
+      });
     },
     /** 退出钻取详情后恢复列表/图表 */
     refreshListAfterExitDetail() {
-      const restoredCode = getQueryCode(this.regionContext);
-      if (!restoredCode) {
-        this.goNationalViewViaFacade();
-      }
-      if (
-        restoredCode &&
-        (this.disasterTypeIndex === 1 || this.disasterTypeIndex === 2)
-      ) {
-        this.restoreActiveRegionBoundary();
-      }
-      if (this.disasterTypeIndex === 1) {
-        this.fetchRainfallWarningInfo();
-        this.getByyjcsData();
-        this.getJsData();
-        this.initChart(this.wlsxsjyRainRankList);
-      } else if (this.disasterTypeIndex === 2) {
-        this.showMaker(false, "skjyXz");
-        this.initChart(this.skjsRainRankList);
-      } else if (this.disasterTypeIndex === 3) {
-        this.tabDisasterType(3);
-      } else if (this.disasterTypeIndex === 4) {
-        this.tabDisasterType(4);
-      }
+      const plan = planRefreshListAfterExitDetail({
+        restoredCode: getQueryCode(this.regionContext),
+        disasterTypeIndex: this.disasterTypeIndex
+      });
+      (plan.actions || []).forEach(action => {
+        if (action === "goNational") {
+          this.goNationalViewViaFacade();
+        } else if (action === "restoreBoundary") {
+          this.restoreActiveRegionBoundary();
+        } else if (action === "fetchRainfallWarning") {
+          this.fetchRainfallWarningInfo();
+        } else if (action === "getByyjcsData") {
+          this.getByyjcsData();
+        } else if (action === "getJsData") {
+          this.getJsData();
+        } else if (action === "initChartShortTerm") {
+          this.initChart(this.wlsxsjyRainRankList);
+        } else if (action === "showMakerSk") {
+          this.showMaker(false, "skjyXz");
+        } else if (action === "initChartLive") {
+          this.initChart(this.skjsRainRankList);
+        } else if (action === "tabDisasterType3") {
+          this.tabDisasterType(3);
+        } else if (action === "tabDisasterType4") {
+          this.tabDisasterType(4);
+        }
+      });
     },
     /** 回到全国并同步地图、预警、右侧列表 */
     navigateToNational(options = {}) {
@@ -3719,103 +3677,106 @@ export default {
       if (this.myChart) {
         this.disposeSumChart();
       }
-      (this.yjcsTlCheckData = true),
-        (this.jyfwTlCheckData = true),
-        (this.jydjTlCheckData = true),
-        (this.jssdTlCheckData = true);
-      this.jylzdgwCheckData = true;
-
-      this.removeMapAllMaker(); // 清除所有marker
+      Object.assign(this, buildTaskListUiResetFlags());
+      this.removeMapAllMaker();
       getTaskList({
         taskType: type
       }).then(res => {
-        if (res.code === 200) {
-          if (res.data.length == 0) {
+        if (res.code !== 200) {
+          return;
+        }
+        if (res.data.length == 0) {
+          const emptyPlan = planEmptyTaskListResult({
+            pendingDrill: this.pendingCrossModuleFloodDrill,
+            disasterTypeIndex: this.disasterTypeIndex
+          });
+          if (emptyPlan.clearTimeline) {
             this.timeData = [];
-            this.initTimeLine(); // 初始化时间轴
-            // 清空山洪右侧表格
+            this.initTimeLine();
+          }
+          if (emptyPlan.clearFloodRanks) {
             this.sHjssdRainRankList = [];
             this.jssdRainRankList = [];
-            const pendingDrill = this.pendingCrossModuleFloodDrill;
-            this.pendingCrossModuleFloodDrill = null;
-            if (
-              shouldHandleEmptyTaskCrossModuleDrill(
-                pendingDrill,
-                this.disasterTypeIndex
-              )
-            ) {
-              this.handleCrossModuleFloodDrillNoData(pendingDrill);
-            }
-          } else {
-            this.taskList = res.data;
-            this.taskStatus = res.data[0].lostdata || "";
-
-            const savedIsNowTime = sessionStorage.getItem(
-              "rapidAnalysis_isNowTime"
-            );
-            const savedTaskTime = sessionStorage.getItem(
-              "rapidAnalysis_taskSelectedTime"
-            );
-            const timeState = resolveTaskSelectedTime({
-              savedIsNowTime: savedIsNowTime,
-              savedTaskTime: savedTaskTime,
-              latestTaskTime: res.data[0].tasktime || ""
-            });
-            this.taskSelectedTime = timeState.taskSelectedTime;
-            this.isNowTime = timeState.isNowTime;
-            this.historyTaskTime = timeState.historyTaskTime;
-
-            this.getNowTime();
-            this.applyPostTaskLoadPlan(
-              resolvePostTaskLoadPlan({
-                disasterTypeIndex: this.disasterTypeIndex,
-                skipRegionRestore: skipRegionRestore,
-                tjuTabChke: this.tjuTabChke,
-                csnlValue: this.csnlValue,
-                shValue: this.shValue
-              })
-            );
           }
+          const pendingDrill = emptyPlan.pendingDrill;
+          if (emptyPlan.clearPending) {
+            this.pendingCrossModuleFloodDrill = null;
+          }
+          if (emptyPlan.handleCrossModuleNoData) {
+            this.handleCrossModuleFloodDrillNoData(pendingDrill);
+          }
+          return;
         }
+        this.taskList = res.data;
+        this.taskStatus = res.data[0].lostdata || "";
+        const timeState = resolveTaskSelectedTime({
+          savedIsNowTime: sessionStorage.getItem("rapidAnalysis_isNowTime"),
+          savedTaskTime: sessionStorage.getItem(
+            "rapidAnalysis_taskSelectedTime"
+          ),
+          latestTaskTime: res.data[0].tasktime || ""
+        });
+        this.taskSelectedTime = timeState.taskSelectedTime;
+        this.isNowTime = timeState.isNowTime;
+        this.historyTaskTime = timeState.historyTaskTime;
+        this.getNowTime();
+        this.applyPostTaskLoadPlan(
+          buildPostTaskLoadExecution({
+            disasterTypeIndex: this.disasterTypeIndex,
+            skipRegionRestore: skipRegionRestore,
+            tjuTabChke: this.tjuTabChke,
+            csnlValue: this.csnlValue,
+            shValue: this.shValue
+          })
+        );
       });
     },
     /** 执行任务列表加载后的后续动作 */
-    applyPostTaskLoadPlan(plan) {
-      if (!plan) return;
-      if (plan.syncRegion) {
-        this.syncActiveRegionToButton();
+    applyPostTaskLoadPlan(execution) {
+      if (!execution || !Array.isArray(execution.actions)) {
+        return;
       }
-      if (plan.fetchWarning === "rainfall") {
-        this.fetchRainfallWarningInfo();
-      } else if (plan.fetchWarning === "csnl") {
-        this.fetchCsnlWarningInfo();
-      } else if (plan.fetchWarning === "sh") {
-        this.fetchShWarningInfo();
-      }
-      if (plan.loadData === "shortTermSixHour") {
-        this.getByyjcsData();
-        this.getJsData();
-      } else if (plan.loadData === "shortTermOther") {
-        this.getSixData();
-        this.reloadShortTermRainfallLayers();
-      } else if (plan.loadData === "urbanFloodFuture") {
-        this.getNlyjcsData();
-        this.getJssdData();
-      } else if (plan.loadData === "urbanFloodPast") {
-        this.getNlyjcsGqThreeData();
-        this.getJsGqthreeData();
-      } else if (plan.loadData === "mountainFloodFuture") {
-        this.getshyjcsData();
-        this.getshJssdData();
-      } else if (plan.loadData === "mountainFloodPast") {
-        this.getshYjGqData();
-        this.getShGqthreeData();
-      }
-      if (plan.restoreBoundary && this.getActiveFloodXzqdm()) {
-        this.$nextTick(() => {
-          this.restoreActiveRegionBoundary();
-        });
-      }
+      execution.actions.forEach(action => {
+        if (action === "syncRegion") {
+          this.syncActiveRegionToButton();
+        } else if (action === "fetchRainfallWarning") {
+          this.fetchRainfallWarningInfo();
+        } else if (action === "fetchCsnlWarning") {
+          this.fetchCsnlWarningInfo();
+        } else if (action === "fetchShWarning") {
+          this.fetchShWarningInfo();
+        } else if (action === "getByyjcsData") {
+          this.getByyjcsData();
+        } else if (action === "getJsData") {
+          this.getJsData();
+        } else if (action === "getSixData") {
+          this.getSixData();
+        } else if (action === "reloadShortTermRainfallLayers") {
+          this.reloadShortTermRainfallLayers();
+        } else if (action === "getNlyjcsData") {
+          this.getNlyjcsData();
+        } else if (action === "getJssdData") {
+          this.getJssdData();
+        } else if (action === "getNlyjcsGqThreeData") {
+          this.getNlyjcsGqThreeData();
+        } else if (action === "getJsGqthreeData") {
+          this.getJsGqthreeData();
+        } else if (action === "getshyjcsData") {
+          this.getshyjcsData();
+        } else if (action === "getshJssdData") {
+          this.getshJssdData();
+        } else if (action === "getshYjGqData") {
+          this.getshYjGqData();
+        } else if (action === "getShGqthreeData") {
+          this.getShGqthreeData();
+        } else if (action === "restoreBoundary") {
+          if (this.getActiveFloodXzqdm()) {
+            this.$nextTick(() => {
+              this.restoreActiveRegionBoundary();
+            });
+          }
+        }
+      });
     },
     // 积水深度过去三小时时间轴（仅钻取详情或 3D 使用）
     getSKLSSJZ(id) {
@@ -3884,188 +3845,148 @@ export default {
       this.isOpenLayerList = false;
       this.IdentifyShow = false;
       this.gqsxstl = true;
-      if (this.qxyjCheckkData && type == 1) {
+      if (shouldSearchQxtYjOnSwitch(this.qxyjCheckkData, type)) {
         this.searchQxtYj();
       }
-      if (this.nlColumns.length == 5) {
-        this.nlColumns.pop();
-        this.nlColumns.push({
-          title: "",
-          key: "star",
-          dataIndex: "star",
-          align: "center",
-          scopedSlots: { customRender: "star" },
-          width: 50
-        });
-      }
+      this.nlColumns = resolveShortTermRankColumnsOnSwitch(this.nlColumns);
       this.isInitTableChart = true;
       this.reconcileRegionFromButton();
-      if ([1, 2].includes(this.disasterTypeIndex) && type !== this.disasterTypeIndex) {
+      const prep = planModuleSwitchRegionPrep({
+        fromIndex: this.disasterTypeIndex,
+        toType: type,
+        mode: this.regionContext.mode
+      });
+      if (prep.saveBrowseSnapshot) {
         this.saveBrowseSnapshotIfNeeded();
       }
-      if (this.regionContext.mode === REGION_MODE.DRILL) {
+      if (prep.promoteDrill) {
         this.promoteDrillRegionBeforeModuleSwitch();
       }
-      this.syncRegionOnModuleSwitch(type);
-      this.isByDetailsChart = false;
-      this.isSkDetailsChart = false;
-      this.isJsDetailsChart = false;
-      this._clearFloodSubmergedMapLayers();
-      if (this._floodSubmergedLoadTimer) {
+      if (prep.syncOnSwitch) {
+        this.syncRegionOnModuleSwitch(type);
+      }
+      const cleanup = planModuleSwitchCleanup();
+      if (cleanup.clearDetailFlags) {
+        this.isByDetailsChart = false;
+        this.isSkDetailsChart = false;
+        this.isJsDetailsChart = false;
+      }
+      if (cleanup.clearFloodSubmergedLayers) {
+        this._clearFloodSubmergedMapLayers();
+      }
+      if (cleanup.clearFloodSubmergedTimer && this._floodSubmergedLoadTimer) {
         clearTimeout(this._floodSubmergedLoadTimer);
         this._floodSubmergedLoadTimer = null;
       }
-      this.floodSubmergedRequestId += 1;
-      if (earthMap) {
-        this.clearBusinessLayersViaFacade();
-        this.clearRainfallLayerCache();
+      if (cleanup.bumpSubmergedRequestId) {
+        this.floodSubmergedRequestId += 1;
       }
-      this.clearAdminRegionBoundaries();
-      this.removeMapAllMaker(); // 清除所有marker
-      this.showTaskList = false;
-      // 1 未来三小时降水排行 2 实时累计降雨排行 3 积水深度排行
+      if (earthMap) {
+        if (cleanup.clearBusinessLayersIfMap) {
+          this.clearBusinessLayersViaFacade();
+        }
+        if (cleanup.clearRainfallCacheIfMap) {
+          this.clearRainfallLayerCache();
+        }
+      }
+      if (cleanup.clearAdminBoundaries) {
+        this.clearAdminRegionBoundaries();
+      }
+      if (cleanup.clearMarkers) {
+        this.removeMapAllMaker();
+      }
+      if (cleanup.hideTaskList) {
+        this.showTaskList = false;
+      }
       this.disasterTypeIndex = type;
-      this.currentActiveModule = type; // 更新当前激活的模块
-      if (type === 3 || type === 4) {
+      this.currentActiveModule = type;
+      const pendingPlan = planModuleSwitchPending({ toType: type });
+      if (pendingPlan.adoptCrossModule) {
         this.adoptCrossModuleRegionIfNeeded(crossModuleFloodDrill);
+      }
+      if (pendingPlan.clearDrillFields) {
         this.detailsTitleXzqh = "";
         this.tableDirllObj = {};
+      }
+      if (pendingPlan.setPending) {
         this.pendingCrossModuleFloodDrill = this.buildPendingFloodRegion();
-      } else {
+      } else if (pendingPlan.clearPending) {
         this.pendingCrossModuleFloodDrill = null;
       }
-      if ([1, 2, 3, 4].includes(type)) {
-        const activeCode = this.getActiveFloodXzqdm();
-        if (activeCode) {
-          this.syncActiveRegionToButton();
-          this.$nextTick(() => {
-            this.restoreActiveRegionBoundary();
-          });
-        } else {
-          if (this.$refs.buttonPostion) {
-            this.$refs.buttonPostion.resetToNational({ silent: true });
-          }
-          this.goNationalViewViaFacade();
+      const boundaryPlan = planModuleSwitchBoundary({
+        toType: type,
+        activeCode: this.getActiveFloodXzqdm()
+      });
+      if (boundaryPlan.action === "syncAndRestore") {
+        this.syncActiveRegionToButton();
+        this.$nextTick(() => {
+          this.restoreActiveRegionBoundary();
+        });
+      } else if (boundaryPlan.action === "resetNational") {
+        if (this.$refs.buttonPostion) {
+          this.$refs.buttonPostion.resetToNational({ silent: true });
         }
+        this.goNationalViewViaFacade();
       }
       this.timeTabActive = 2;
-      const uiMeta = resolveModuleUiMeta(type);
-      if (type === 1 && uiMeta) {
+      const loadPlan = planModuleSwitchLoad({
+        toType: type,
+        csnlValue: this.csnlValue,
+        shValue: this.shValue,
+        isMapType: this.isMapType
+      });
+      const uiMeta = loadPlan.uiMeta;
+      if (loadPlan.kind === "shortTerm" && uiMeta) {
         this.isMapType = uiMeta.isMapType;
         this.mapTitleName = uiMeta.mapTitleName;
         this.rankingListTitle = uiMeta.rankingListTitle;
         this.statisticsChartTitle = uiMeta.statisticsChartTitle;
         this.isTaskListBtn = uiMeta.isTaskListBtn;
-        this.getTaskList(uiMeta.taskType, { skipRegionRestore: true });
-      } else if (type === 2 && uiMeta) {
+        this.getTaskList(loadPlan.taskType, {
+          skipRegionRestore: loadPlan.skipRegionRestore
+        });
+      } else if (loadPlan.kind === "live" && uiMeta) {
         this.isMapType = uiMeta.isMapType;
         this.mapTitleName = uiMeta.mapTitleName;
-        this.scrollTopList = [];
+        if (loadPlan.clearScrollTop) {
+          this.scrollTopList = [];
+        }
         this.isTaskListBtn = uiMeta.isTaskListBtn;
         this.rankingListTitle = uiMeta.rankingListTitle;
         this.statisticsChartTitle = uiMeta.statisticsChartTitle;
-        this.getTaskList(uiMeta.taskType, { skipRegionRestore: true });
-        if (uiMeta.alsoLoadLiveRain) {
+        this.getTaskList(loadPlan.taskType, {
+          skipRegionRestore: loadPlan.skipRegionRestore
+        });
+        if (loadPlan.alsoLoadLiveRain) {
           this.getSkJsData();
         }
-      } else if (type === 3) {
-        if (this.nlColumns.length == 4) {
-          if (this.csnlValue == 1) {
-            this.nlColumns.push({
-              title: "预警等级",
-              key: "yjlevel",
-              scopedSlots: { customRender: "yjlevel" },
-              align: "center"
-            });
-            this.nlColumns.push({
-              title: "",
-              key: "star",
-              dataIndex: "star",
-              align: "center",
-              scopedSlots: { customRender: "star" },
-              width: 50
-            });
-          }
-        } else {
-          this.nlColumns.pop();
-          this.nlColumns.push({
-            title: "",
-            key: "star",
-            dataIndex: "star",
-            align: "center",
-            scopedSlots: { customRender: "star" },
-            width: 50
-          });
-        }
+      } else if (
+        loadPlan.kind === "urbanFlood" ||
+        loadPlan.kind === "mountainFlood"
+      ) {
+        this.nlColumns = resolveFloodRankColumns(
+          this.nlColumns,
+          loadPlan.periodValue
+        );
         if (uiMeta) {
-          this.tjuTabChke = uiMeta.tjuTabChke || this.tjuTabChke;
+          if (uiMeta.tjuTabChke) {
+            this.tjuTabChke = uiMeta.tjuTabChke;
+          }
           this.mapTitleName = uiMeta.mapTitleName;
           this.rankingListTitle = uiMeta.rankingListTitle;
           this.statisticsChartTitle = uiMeta.statisticsChartTitle;
           this.isTaskListBtn = uiMeta.isTaskListBtn;
         }
-        this.scrollTopList = [];
-        if (this.isMapType) {
+        if (loadPlan.clearScrollTop) {
+          this.scrollTopList = [];
+        }
+        if (loadPlan.resetThreeMap && this.$refs.threeMap) {
           this.$refs.threeMap.resetApi();
           this.$refs.threeMap.clearEffect();
         }
-        this.getTaskList(
-          resolveTaskTypeForModule({
-            disasterTypeIndex: 3,
-            csnlValue: this.csnlValue,
-            shValue: this.shValue
-          }),
-          { skipRegionRestore: true }
-        );
-      } else if (type === 4) {
-        if (this.nlColumns.length == 4) {
-          if (this.shValue == 1) {
-            this.nlColumns.push({
-              title: "预警等级",
-              key: "yjlevel",
-              scopedSlots: { customRender: "yjlevel" },
-              align: "center"
-            });
-            this.nlColumns.push({
-              title: "",
-              key: "star",
-              dataIndex: "star",
-              align: "center",
-              scopedSlots: { customRender: "star" },
-              width: 50
-            });
-          }
-        } else {
-          this.nlColumns.pop();
-          this.nlColumns.push({
-            title: "",
-            key: "star",
-            dataIndex: "star",
-            align: "center",
-            scopedSlots: { customRender: "star" },
-            width: 50
-          });
-        }
-        if (uiMeta) {
-          this.mapTitleName = uiMeta.mapTitleName;
-          this.rankingListTitle = uiMeta.rankingListTitle;
-          this.statisticsChartTitle = uiMeta.statisticsChartTitle;
-          this.isTaskListBtn = uiMeta.isTaskListBtn;
-        }
-        this.scrollTopList = [];
-
-        if (this.isMapType) {
-          this.$refs.threeMap.resetApi();
-          this.$refs.threeMap.clearEffect();
-        }
-        this.getTaskList(
-          resolveTaskTypeForModule({
-            disasterTypeIndex: 4,
-            csnlValue: this.csnlValue,
-            shValue: this.shValue
-          }),
-          { skipRegionRestore: true }
-        );
+        this.getTaskList(loadPlan.taskType, {
+          skipRegionRestore: loadPlan.skipRegionRestore
+        });
       }
     },
     getShTimeData(modelType, type, xzqdm) {

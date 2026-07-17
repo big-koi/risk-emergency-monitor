@@ -37,3 +37,13 @@ export {
   normalizeIncomingXzqdm,
   planPositionXzqCodeChange
 } from "./positionChange";
+
+export {
+  mergeRegionContextState,
+  shouldShadowSyncBrowseStore,
+  resolveDrillTableLabel,
+  resolveRegionButtonLabel as resolveRegionButtonLabelFromSources,
+  composeRegionPartsLabel,
+  resolveRegionDisplayLabel as resolveRegionDisplayLabelFromSources,
+  buildToolbarRegionPayload
+} from "./applyContext";
