@@ -104,6 +104,29 @@ export function buildOpenSelectCasePatch() {
 }
 
 /**
+ * 收藏入口预处理后的后续动作
+ * @param {{ detailsShow, fullscreen, selectMode?: 'full'|'light' }} flags
+ *   selectMode full=重置选择并打开；light=仅打开选择面板（点位收藏）
+ * @returns {{ action: 'addToCollection'|'openSelect', selectPatch?: object }}
+ */
+export function planStarCollectFollowUp(flags) {
+  const f = flags || {};
+  if (isCaseDetailsEditing(f.detailsShow, f.fullscreen)) {
+    return { action: "addToCollection" };
+  }
+  if (f.selectMode === "light") {
+    return {
+      action: "openSelect",
+      selectPatch: { isCaseCollectionSelectShow: true }
+    };
+  }
+  return {
+    action: "openSelect",
+    selectPatch: buildOpenSelectCasePatch()
+  };
+}
+
+/**
  * 灾种 index → 收藏接口 yjlx
  * 1 短临→1，3 内涝→2，4 山洪→5
  */
@@ -214,6 +237,7 @@ export default {
   buildPrintStarPrep,
   buildStarCasePrep,
   buildOpenSelectCasePatch,
+  planStarCollectFollowUp,
   resolveCollectYjlx,
   buildSingleCollectPointParams,
   buildSingleCollectDataParams,

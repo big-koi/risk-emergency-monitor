@@ -69,6 +69,124 @@ export function buildDrillDepthLayerOptions(imageExtent, overrides) {
   return Object.assign(base, overrides || {});
 }
 
+/** 模块切换 removeAllLayer 后复位可见 key */
+export function buildRainfallLayerCacheResetPatch() {
+  return {
+    currentVisibleLayerKey: null,
+    updateDateTimeCurrentVisibleLayerKey: null,
+    drillCurrentVisibleLayerKey: null
+  };
+}
+
+/**
+ * 收集 layerCache 中 key 包含 substring 的项
+ */
+export function collectLayerCacheKeysBySubstring(layerCache, substring) {
+  const keys = [];
+  if (!layerCache || !substring) return keys;
+  layerCache.forEach(function(_value, key) {
+    if (key && key.indexOf(substring) !== -1) {
+      keys.push(key);
+    }
+  });
+  return keys;
+}
+
+/**
+ * 按 key 列表移除缓存图层（removeLayer 由页面注入，兼容 me.earth / Facade）
+ */
+export function purgeLayerCacheEntries(layerCache, keys, removeLayer) {
+  if (!layerCache || !keys || !keys.length) return;
+  keys.forEach(function(key) {
+    const layer = layerCache.get(key);
+    if (layer && typeof removeLayer === "function") {
+      try {
+        removeLayer(layer);
+      } catch (e) {
+        console.warn("移除图层失败:", e);
+      }
+    }
+    layerCache.delete(key);
+  });
+}
+
+/**
+ * 按行政区代码清理钻取预加载缓存
+ */
+export function purgeDrillLayerCacheByXzqdm(layerCache, xzqdm, removeLayer) {
+  const keys = collectLayerCacheKeysBySubstring(layerCache, xzqdm || "");
+  purgeLayerCacheEntries(layerCache, keys, removeLayer);
+  return keys;
+}
+
+/**
+ * 时间轴当前帧分支判定（原 updateDateTime 路由）
+ * @returns {{ action: string, filename?: * }}
+ */
+export function resolveTimelineFrameAction(options) {
+  const opts = options || {};
+  const idx = opts.disasterTypeIndex;
+  const obj = opts.obj;
+
+  if (idx === 1) {
+    return { action: "shortTermCache" };
+  }
+  if (idx === 3 || idx === 4) {
+    if (opts.isMapType) {
+      return {
+        action: "threeMap",
+        filename: obj && obj.filename
+      };
+    }
+    if (
+      opts.isJsDetailsChart &&
+      obj &&
+      obj.filename &&
+      obj.filename.length > 0
+    ) {
+      return { action: "drillVisible" };
+    }
+    return { action: "floodFetch" };
+  }
+  return { action: "noop" };
+}
+
+/**
+ * 钻取时间轴「当前帧」切换（原 updateDateTime 2D 钻取命中缓存）
+ * @returns {{ status: 'hit'|'miss'|'fallback', layerKey?: string }}
+ */
+export function applyDrillVisibleFrame(ctx) {
+  const obj = ctx.obj;
+  if (!obj || !obj.filename || !obj.filename.length) {
+    return { status: "fallback" };
+  }
+
+  const layerKey = buildDrillRainfallLayerKey(obj, ctx.xzqdm || "");
+  const targetLayer =
+    ctx.layerCache && typeof ctx.layerCache.get === "function"
+      ? ctx.layerCache.get(layerKey)
+      : null;
+
+  if (!targetLayer) {
+    return { status: "miss", layerKey: layerKey };
+  }
+
+  if (typeof ctx.clearBusinessLayers === "function") {
+    ctx.clearBusinessLayers();
+  }
+
+  if (ctx.currentVisibleKey && ctx.currentVisibleKey !== layerKey) {
+    hideCachedRainfallLayer(ctx.layerCache, ctx.currentVisibleKey);
+  }
+
+  if (typeof ctx.addHostLayer === "function") {
+    ctx.addHostLayer(targetLayer);
+  }
+
+  showCachedRainfallLayer(targetLayer, 0.5);
+  return { status: "hit", layerKey: layerKey };
+}
+
 /**
  * 钻取时间轴预加载一帧（原 cacheDrillLayers 单步）
  * @returns {{ status: 'done'|'skip'|'pending', nextIndex?: number, layerKey?: string }}
@@ -258,6 +376,12 @@ export default {
   hideCachedRainfallLayer,
   showCachedRainfallLayer,
   buildDrillRainfallLayerKey,
+  buildRainfallLayerCacheResetPatch,
+  collectLayerCacheKeysBySubstring,
+  purgeLayerCacheEntries,
+  purgeDrillLayerCacheByXzqdm,
+  resolveTimelineFrameAction,
+  applyDrillVisibleFrame,
   applyShortTermVisibleFrame,
   applyShortTermPreloadFrame,
   applyDrillPreloadFrame

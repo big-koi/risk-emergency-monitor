@@ -4,6 +4,12 @@ export {
   buildExitDrillPartial,
   normalizeButtonRegionCode,
   normalizeBrowseStoreCode,
+  isInTableDetailView,
+  normalizeOpenDetailsDrillItem,
+  buildOpenDetailsChartStatePatch,
+  planOpenDetailsChart,
+  buildCrossModuleFloodNoDataPatch,
+  planCrossModuleFloodNoDataRegion,
   getQueryCode,
   REGION_MODE
 } from "./drillState";

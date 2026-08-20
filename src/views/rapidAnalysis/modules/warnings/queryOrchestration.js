@@ -123,6 +123,83 @@ export function resolveWarningApiPayload(res, options) {
   };
 }
 
+/**
+ * 按灾种解析应拉取的预警类型
+ * @returns {'rainfall'|'csnl'|'sh'|null}
+ */
+export function resolveModuleWarningFetchKind(disasterTypeIndex) {
+  if (disasterTypeIndex === 1 || disasterTypeIndex === 2) {
+    return "rainfall";
+  }
+  if (disasterTypeIndex === 3) {
+    return "csnl";
+  }
+  if (disasterTypeIndex === 4) {
+    return "sh";
+  }
+  return null;
+}
+
+/**
+ * 预警请求启动计划（初始空态 / 是否跳过接口）
+ * emptyOptsMode: 'simple' | 'buildOpts'（山洪与原逻辑一致用 buildOpts）
+ */
+export function planWarningInfoFetchStart(options) {
+  const opts = options || {};
+  const bundle = opts.bundle || {};
+  const code = bundle.code;
+  const regionLabel = bundle.regionLabel;
+  const params = bundle.params;
+  const taskTime = opts.taskTime;
+  const buildOpts = buildWarningDisplayOpts(
+    regionLabel,
+    taskTime,
+    opts.regionParts
+  );
+  const emptyOpts =
+    opts.emptyOptsMode === "buildOpts"
+      ? buildOpts
+      : { regionLabel: regionLabel, taskTime: taskTime };
+
+  return {
+    code: code,
+    regionLabel: regionLabel,
+    params: params,
+    buildOpts: buildOpts,
+    emptyOpts: emptyOpts,
+    initialInfo: opts.getEmpty
+      ? opts.getEmpty(regionLabel, code, emptyOpts)
+      : null,
+    skipFetch: !taskTime
+  };
+}
+
+/** 接口成功/业务失败后的 payload（复用 resolveWarningApiPayload） */
+export function planWarningInfoFetchSuccess(res, startPlan, adapters) {
+  const start = startPlan || {};
+  const ad = adapters || {};
+  return resolveWarningApiPayload(res, {
+    code: start.code,
+    regionLabel: start.regionLabel,
+    buildOpts: start.buildOpts,
+    emptyOpts: start.emptyOpts,
+    buildInfo: ad.buildInfo,
+    getEmpty: ad.getEmpty
+  });
+}
+
+/** 网络失败时的空态 */
+export function planWarningInfoFetchCatch(startPlan, getEmpty) {
+  const start = startPlan || {};
+  return {
+    rawData: null,
+    info:
+      typeof getEmpty === "function"
+        ? getEmpty(start.regionLabel, start.code, start.emptyOpts)
+        : null
+  };
+}
+
 export default {
   shouldFetchRainfallWarning,
   shouldFetchCsnlWarning,
@@ -131,5 +208,9 @@ export default {
   resolveActiveWarningQueryCode,
   buildWarningQueryBundle,
   buildWarningDisplayOpts,
-  resolveWarningApiPayload
+  resolveWarningApiPayload,
+  resolveModuleWarningFetchKind,
+  planWarningInfoFetchStart,
+  planWarningInfoFetchSuccess,
+  planWarningInfoFetchCatch
 };

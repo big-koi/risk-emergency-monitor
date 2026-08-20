@@ -6,6 +6,8 @@ export {
 export {
   shouldReloadShortTermRainfallLayers,
   fetchShortTermTimeline,
+  planShortTermResolutionApply,
+  DEFAULT_SHORT_TERM_RESOLUTION,
   getShortTermMapTitle
 } from "./timeline";
 

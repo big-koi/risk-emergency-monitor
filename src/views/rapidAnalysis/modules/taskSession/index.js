@@ -19,12 +19,21 @@ export {
   resolveShortTermRankColumnsOnSwitch,
   shouldSearchQxtYjOnSwitch,
   planModuleSwitchCleanup,
-  planModuleSwitchPanelReset
+  planModuleSwitchPanelReset,
+  buildModuleActiveIndexPatch,
+  buildModuleUiMetaStatePatch,
+  uncheckLayerListOptions
 } from "./moduleSwitch";
 
 export {
   buildTaskListUiResetFlags,
   planEmptyTaskListResult,
   expandPostTaskLoadActions,
-  buildPostTaskLoadExecution
+  buildPostTaskLoadExecution,
+  TASK_TIME_SESSION_KEYS,
+  TASK_HOUR_SLOTS,
+  buildTaskItemSelectPatch,
+  applyTaskTimeSessionOps,
+  planTaskItemClickRefresh,
+  buildFilledTaskTimeDataList
 } from "./taskLoad";

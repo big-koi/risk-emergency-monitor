@@ -9,9 +9,9 @@
 - [x] 行政区 Vuex 模型（浏览 / 钻取分离）
 - [x] MapFacade + Legacy 适配（业务逐步离开 `window.me`）
 - [x] 右侧排行 / 预警 / 统计 / 详情 UI 拆分起步
-- [ ] `index.vue` 显著瘦身（目标：God 组件 < 3000 行或按灾种拆页）
-- [ ] 业务读源以 Region Store 为主，弱化 / 删除 `regionContext`
-- [ ] 地图创建不依赖全局 `diitgis` / `me.earth` 散落调用（经 Facade）
+- [x] `index.vue` 显著瘦身（目标：God 组件 < 3000 行或按灾种拆页）
+- [ ] 业务读源以 Region Store 为主，弱化 / 删除 `regionContext`（第 52 批：工具栏 / `getStoreQueryCode` 已优先 Store，写路径仍双轨）
+- [ ] 地图调用不依赖全局 `diitgis` / `me.earth` 散落调用（经 Facade）（第 52 批：操作层清除与钻取 purge 已收口，Facade 内仍可回退宿主）
 
 ## Vue3 迁移风险点
 

@@ -1,188 +1,189 @@
 import diitgis from "@/components/Layer/LayerManagerForDiitGIS";
+import {
+  planOpenLayerListPanel,
+  planShowIdentifyPanel,
+  planPosttionButton,
+  planYjcsTlToggle,
+  planJyfwTlToggle,
+  planJydjTlToggle,
+  planJssdTlToggle,
+  planJylzdgwToggle,
+  planQxyjToggle
+} from "./modules/mapLayers/legendToggle";
+import {
+  planSearchBackwardIdentify,
+  planGeocodeIdentifyApply
+} from "./modules/warnings/tiandituGeocode";
 
 // mixin.js
 export const myMixin = {
-
-    data() {
-        return {
-            yjcsTlCheckData: true,
-            jyfwTlCheckData: true,
-            jydjTlCheckData: true,
-            jssdTlCheckData: true,
-            qxyjCheckkData: false,
-            hlTlData: [],
+  data() {
+    return {
+      yjcsTlCheckData: true,
+      jyfwTlCheckData: true,
+      jydjTlCheckData: true,
+      jssdTlCheckData: true,
+      qxyjCheckkData: false,
+      hlTlData: []
+    };
+  },
+  mounted() {},
+  created() {},
+  methods: {
+    closeIdentify() {
+      this.popupShow = false;
+    },
+    // 地图点位经纬度查询数据
+    searchBackward(type, item) {
+      const plan = planSearchBackwardIdentify(type, item);
+      if (plan.action === "direct") {
+        this.identifyModel = plan.identifyModel;
+        this.$nextTick(() => {
+          this.identifyOverlay.setPosition(plan.position);
+          this.popupShow = true;
+        });
+        return;
+      }
+      const that = this;
+      fetch(plan.geocodeUrl)
+        .then(function(res) {
+          return res.json();
+        })
+        .then(function(res) {
+          const applied = planGeocodeIdentifyApply(res, plan.jyl);
+          if (!applied.ok) {
+            that.$message.error("查询失败");
+            return;
+          }
+          that.popupShow = true;
+          that.identifyModel = applied.identifyModel;
+          that.identifyModellat = applied.identifyModellat;
+          that.identifyModellon = applied.identifyModellon;
+          that.$nextTick(function() {
+            that.identifyOverlay.setPosition(applied.position);
+          });
+        })
+        .catch(function(err) {
+          console.error(err);
+          that.$message.error("查询失败");
+        });
+    },
+    // 基础图层添加图列
+    ischeck(data) {
+      this.hlTlData = data;
+    },
+    posttionButton() {
+      Object.assign(this, planPosttionButton());
+    },
+    openLayerList() {
+      const plan = planOpenLayerListPanel();
+      if (plan.clearButtonModel && this.$refs.buttonPostion) {
+        this.$refs.buttonPostion.isModel = false;
+      }
+      Object.assign(this, plan.statePatch);
+    },
+    removeLocatlayer() {},
+    //点位查询按钮
+    showIdentify() {
+      const plan = planShowIdentifyPanel();
+      if (plan.clearButtonModel && this.$refs.buttonPostion) {
+        this.$refs.buttonPostion.isModel = false;
+      }
+      Object.assign(this, plan.statePatch);
+    },
+    closeClick() {
+      this.IdentifyShow = false;
+      const marker_class = document.getElementsByClassName("markerToobar_class");
+      Array.from(marker_class).forEach(marker => marker.remove());
+    },
+    addMaker(data) {
+      const marker_class = document.getElementsByClassName("markerToobar_class");
+      Array.from(marker_class).forEach(marker => marker.remove());
+      const imgUrl = require("../../assets/images/rapidAnalysis/locat.png");
+      diitgis.addToobarrMarker(
+        [data.result.location.lon, data.result.location.lat],
+        imgUrl,
+        {}
+      );
+    },
+    /** 执行图例勾选计划 */
+    applyLegendTogglePlan(plan) {
+      if (!plan) return;
+      if (plan.statePatch) {
+        Object.assign(this, plan.statePatch);
+      }
+      const action = plan.action;
+      if (action === "showMaker") {
+        this.showMaker(true, plan.markerClass);
+      } else if (action === "hideMaker") {
+        this.showMaker(false, plan.markerClass);
+      } else if (action === "getByyjcsColorImg") {
+        this.getByyjcsData("colorImg");
+      } else if (action === "removeAllLayer") {
+        if (this.earthMap && this.earthMap.removeAllLayer) {
+          this.earthMap.removeAllLayer();
         }
-    },
-    mounted() {
-    },
-    created() {
-    },
-    methods: {
-        closeIdentify() {
-            this.popupShow = false
-        },
-        // 地图点位经纬度查询数据
-        searchBackward(type, item) {
-            if (['qxyj', 'byyj'].includes(type)) {
-                this.identifyModel = item
-                this.$nextTick(() => {
-                    this.identifyOverlay.setPosition([item.lon, item.lat])
-                    this.popupShow = true
-                })
-            } else {
-                fetch(`https://api.tianditu.gov.cn/geocoder?postStr={"lon":${item.lon},"lat":${item.lat},'ver':1}&type=geocode&tk=73544acc9abce21e7fd4523c6f077d74`)
-                    .then(res => res.json())
-                    .then(res => {
-                        this.popupShow = true
-                        this.identifyModel = res.result.addressComponent
-                        this.identifyModel.jyl = item.jyl || item.max
-                        this.identifyModellat = res.result.location.lat
-                        this.identifyModellon = res.result.location.lon
-                        this.$nextTick(() => {
-                            this.identifyOverlay.setPosition([res.result.location.lon, res.result.location.lat])
-                        })
-                    }).catch(err => {
-                        console.error(err)
-                        this.$message.error('查询失败')
-                    })
-            }
-
-        },
-        // 基础图层添加图列
-        ischeck(data) {
-          this.hlTlData = data
-        },
-        posttionButton() {
-            this.showTaskList = false
-            this.isOpenLayerList = false
-            this.IdentifyShow = false
-        },
-        openLayerList() {
-            this.$refs.buttonPostion.isModel = false
-            this.showTaskList = false
-            this.isOpenLayerList = false
-            this.IdentifyShow = false
-            this.isOpenLayerList = true
-        },
-        removeLocatlayer() {
-        },
-        //点位查询按钮
-        showIdentify() {
-            // this.$refs.identifyDom.visible = true
-            this.$refs.buttonPostion.isModel = false
-            this.isOpenLayerList = false
-            this.showTaskList = false
-            this.IdentifyShow = true
-        },
-        closeClick() {
-            this.IdentifyShow = false
-            const marker_class = document.getElementsByClassName("markerToobar_class");
-            const markersArray = Array.from(marker_class);
-            markersArray.forEach(marker => marker.remove());
-
-        },
-        addMaker(data) {
-            const marker_class = document.getElementsByClassName("markerToobar_class");
-            const markersArray = Array.from(marker_class);
-            markersArray.forEach(marker => marker.remove());
-            let imgUrl = require('../../assets/images/rapidAnalysis/locat.png')
-            diitgis.addToobarrMarker([data.result.location.lon, data.result.location.lat], imgUrl, {});
-        },
-        yjcsTlCheck(e) {
-            let value = e.target.checked
-            this.yjcsTlCheckData = value
-            if (value) {
-                this.showMaker(true, 'byyj')
-
-            } else {
-                this.showMaker(false, 'byyj')
-            }
-        },
-        jyfwTlCheck(e) {
-            let value = e.target.checked
-            this.jyfwTlCheckData = value
-            if (value) {
-                this.getByyjcsData('colorImg')
-            } else {
-                this.earthMap.removeAllLayer();
-            }
-        },
-        jydjTlCheck(e) {
-            let value = e.target.checked
-            this.jydjTlCheckData = e.target.checked
-            if (value) {
-                this.showMaker(true, 'yjdj')
-
-            } else {
-                if (this.isMapType) {
-                    this.$refs.threeMap.clearMaker()
-                } else {
-                    this.showMaker(false, 'yjdj')
-
-                }
-            }
-        },
-        jssdTlCheck(e) {
-            let value = e.target.checked
-            this.jssdTlCheckData = value
-            if (value) {
-                if (this.disasterTypeIndex === 3) {
-                    if (this.csnlValue == 1) {
-                        this.getJssdData();
-                    } else {
-                        this.getJsGqthreeData()
-                    }
-                } else if (this.disasterTypeIndex === 4) {
-                    if (this.shValue == 1) {
-                        this.getshJssdData();
-                    } else {
-                        this.getShGqthreeData()
-                    }
-                }
-            } else {
-                if (this.isMapType) {
-                    this.$refs.threeMap.clearEffect()
-                } else {
-                    this.earthMap.removeAllLayer();
-                }
-            }
-
-        },
-        jylzdgwCheck(e) {
-            let value = e.target.checked
-            this.jylzdgwCheckData = value
-            if (value) {
-                // this.getQGMaxWgIcon()
-                this.showMaker(true, 'skjyXz')
-
-            } else {
-                this.showMaker(false, 'skjyXz')
-            }
-        },
-        qxyjCheck(e) {
-            let value = e.target.checked
-            this.qxyjCheckkData = value
-            if (value) {
-                this.searchQxtYj()
-            } else {
-                this.showMaker(false, 'qxyj')
-            }
-        },
-        showMaker(type, className) {
-            const marker_class = document.getElementsByClassName(className);
-            const markersArray = Array.from(marker_class);
-            console.log('markersArray', markersArray);
-            markersArray.forEach((item) => {
-                if (type) {
-                    item.style.display = 'block'
-                } else {
-                    item.style.display = 'none'
-                }
-            })
-
-        },
-        openLayer() {
-            this.isOpenLayerList = false
+      } else if (action === "clearThreeMaker") {
+        if (this.$refs.threeMap) {
+          this.$refs.threeMap.clearMaker();
         }
+      } else if (action === "clearThreeEffect") {
+        if (this.$refs.threeMap) {
+          this.$refs.threeMap.clearEffect();
+        }
+      } else if (action === "getJssdData") {
+        this.getJssdData();
+      } else if (action === "getJsGqthreeData") {
+        this.getJsGqthreeData();
+      } else if (action === "getshJssdData") {
+        this.getshJssdData();
+      } else if (action === "getShGqthreeData") {
+        this.getShGqthreeData();
+      } else if (action === "searchQxtYj") {
+        this.searchQxtYj();
+      }
+    },
+    yjcsTlCheck(e) {
+      this.applyLegendTogglePlan(planYjcsTlToggle(e.target.checked));
+    },
+    jyfwTlCheck(e) {
+      this.applyLegendTogglePlan(planJyfwTlToggle(e.target.checked));
+    },
+    jydjTlCheck(e) {
+      this.applyLegendTogglePlan(
+        planJydjTlToggle(e.target.checked, { isMapType: this.isMapType })
+      );
+    },
+    jssdTlCheck(e) {
+      this.applyLegendTogglePlan(
+        planJssdTlToggle(e.target.checked, {
+          isMapType: this.isMapType,
+          disasterTypeIndex: this.disasterTypeIndex,
+          csnlValue: this.csnlValue,
+          shValue: this.shValue
+        })
+      );
+    },
+    jylzdgwCheck(e) {
+      this.applyLegendTogglePlan(planJylzdgwToggle(e.target.checked));
+    },
+    qxyjCheck(e) {
+      this.applyLegendTogglePlan(planQxyjToggle(e.target.checked));
+    },
+    showMaker(type, className) {
+      const marker_class = document.getElementsByClassName(className);
+      const markersArray = Array.from(marker_class);
+      console.log("markersArray", markersArray);
+      markersArray.forEach(item => {
+        if (type) {
+          item.style.display = "block";
+        } else {
+          item.style.display = "none";
+        }
+      });
+    },
+    openLayer() {
+      this.isOpenLayerList = false;
     }
-}
+  }
+};

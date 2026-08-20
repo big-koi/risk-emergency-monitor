@@ -77,6 +77,57 @@ export function buildFloodWarningMarkerJobs(list) {
 }
 
 /**
+ * 将 prepared 中的 iconUrl 写回原 list 引用（供 3D addMaker）
+ */
+export function applyWarningCityIconPatches(sourceList, preparedList) {
+  (sourceList || []).forEach(function(item, index) {
+    const next = preparedList && preparedList[index];
+    if (item && next) {
+      item.iconUrl = next.iconUrl;
+    }
+  });
+}
+
+/**
+ * 预警城市上图编排（原 processWarningCityData）
+ * @returns {{
+ *   clearThreeMaker: boolean,
+ *   scrollTopList: Array,
+ *   preparedList: Array,
+ *   mapAction: 'threeMaker'|'facadeMarkers'|'noop',
+ *   markerJobs: Array
+ * }}
+ */
+export function planProcessWarningCityData(list, options) {
+  const opts = options || {};
+  const source = list || [];
+  const prepared = prepareWarningCityDisplay(source, {
+    isMapType: !!opts.isMapType,
+    prefix: opts.prefix || ""
+  });
+  applyWarningCityIconPatches(source, prepared.list);
+
+  let mapAction = "noop";
+  let markerJobs = [];
+  const hasThree = !!opts.hasThreeMap;
+  if (opts.isMapType && hasThree) {
+    mapAction = "threeMaker";
+  } else if (!opts.isMapType && opts.shouldAddMarker !== false) {
+    mapAction = "facadeMarkers";
+    markerJobs = buildFloodWarningMarkerJobs(prepared.list);
+  }
+
+  return {
+    clearThreeMaker: !!(opts.isMapType && hasThree),
+    scrollTopList: prepared.scrollTopList,
+    preparedList: prepared.list,
+    sourceList: source,
+    mapAction: mapAction,
+    markerJobs: markerJobs
+  };
+}
+
+/**
  * 短临暴雨预警城市：轮播 + marker 任务
  * @returns {{ scrollTopList: Array, markerJobs: Array }}
  */
@@ -136,6 +187,8 @@ export default {
   resolveWarningLevelConfig,
   prepareWarningCityDisplay,
   buildFloodWarningMarkerJobs,
+  applyWarningCityIconPatches,
+  planProcessWarningCityData,
   prepareRainstormWarningDisplay,
   buildQxtYjMarkerJobs
 };

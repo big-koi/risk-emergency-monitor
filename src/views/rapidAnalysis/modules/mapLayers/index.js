@@ -11,7 +11,10 @@ export {
   pickShortTermTimelineFetcher,
   resolveFloodTimelineDataType,
   shouldShowShortTermResolutionTabs,
-  shouldShowFloodTimelineTabs
+  shouldShowFloodTimelineTabs,
+  TIMELINE_INIT_DELAY_MS,
+  scheduleTimeAxisInit,
+  planTimelineApply
 } from "./timelineStrategy";
 
 export {
@@ -23,6 +26,12 @@ export {
   hideCachedRainfallLayer,
   showCachedRainfallLayer,
   buildDrillRainfallLayerKey,
+  buildRainfallLayerCacheResetPatch,
+  collectLayerCacheKeysBySubstring,
+  purgeLayerCacheEntries,
+  purgeDrillLayerCacheByXzqdm,
+  resolveTimelineFrameAction,
+  applyDrillVisibleFrame,
   applyShortTermVisibleFrame,
   applyShortTermPreloadFrame,
   applyDrillPreloadFrame
@@ -33,5 +42,24 @@ export {
   resolveXzqLevelLabel,
   getDefaultAdminOutlineStyle,
   getDefaultHighlightBoundaryStyle,
-  ADMIN_BOUNDARY_LAYER_IDS
+  ADMIN_BOUNDARY_LAYER_IDS,
+  ADMIN_OUTLINE_LAYER_ID,
+  resolveSearchXzqfwCode,
+  planUpladeLine,
+  planApplySearchXzqfwBoundary,
+  planSearchXzqfwApiResult,
+  planRegionBoundaryFallback,
+  buildAdAreaStaticUrl
 } from "./adminBoundary";
+
+export {
+  planOpenLayerListPanel,
+  planShowIdentifyPanel,
+  planPosttionButton,
+  planYjcsTlToggle,
+  planJyfwTlToggle,
+  planJydjTlToggle,
+  planJssdTlToggle,
+  planJylzdgwToggle,
+  planQxyjToggle
+} from "./legendToggle";

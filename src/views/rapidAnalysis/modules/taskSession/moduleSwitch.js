@@ -249,17 +249,74 @@ export function planModuleSwitchCleanup() {
 }
 
 /**
- * 切换开始时的面板复位（不含图层）
+ * 切换开始时的面板复位（不含地图图层）
+ * @returns {{
+ *   statePatch: object,
+ *   clearHlTlData: boolean,
+ *   closeButtonModel: boolean,
+ *   uncheckLayerLists: boolean,
+ *   clearFloodCrossDrillNoData: boolean
+ * }}
  */
 export function planModuleSwitchPanelReset() {
   return {
+    statePatch: {
+      isOpenLayerList: false,
+      IdentifyShow: false,
+      gqsxstl: true,
+      isInitTableChart: true
+    },
     clearHlTlData: true,
     closeButtonModel: true,
-    closeLayerList: true,
-    closeIdentify: true,
-    enableGqsxstl: true,
-    initTableChart: true
+    uncheckLayerLists: true,
+    clearFloodCrossDrillNoData: true
   };
+}
+
+/** 灾种 index / 激活模块写入 */
+export function buildModuleActiveIndexPatch(type) {
+  return {
+    disasterTypeIndex: type,
+    currentActiveModule: type,
+    timeTabActive: 2
+  };
+}
+
+/**
+ * 从 uiMeta 生成标题/按钮态 patch
+ * @returns {object|null}
+ */
+export function buildModuleUiMetaStatePatch(uiMeta, options) {
+  if (!uiMeta) return null;
+  const opts = options || {};
+  const patch = {
+    mapTitleName: uiMeta.mapTitleName,
+    rankingListTitle: uiMeta.rankingListTitle,
+    statisticsChartTitle: uiMeta.statisticsChartTitle,
+    isTaskListBtn: uiMeta.isTaskListBtn
+  };
+  if (opts.includeMapType && uiMeta.isMapType !== undefined) {
+    patch.isMapType = uiMeta.isMapType;
+  }
+  if (uiMeta.tjuTabChke) {
+    patch.tjuTabChke = uiMeta.tjuTabChke;
+  }
+  return patch;
+}
+
+/** 取消图层列表勾选（就地修改 plainOptions） */
+export function uncheckLayerListOptions(layerList) {
+  if (!layerList) return;
+  if (layerList.plainOptions1) {
+    layerList.plainOptions1.forEach(function(item) {
+      item.isCheck = false;
+    });
+  }
+  if (layerList.plainOptions2) {
+    layerList.plainOptions2.forEach(function(item) {
+      item.isCheck = false;
+    });
+  }
 }
 
 export default {
@@ -274,5 +331,8 @@ export default {
   resolveShortTermRankColumnsOnSwitch,
   shouldSearchQxtYjOnSwitch,
   planModuleSwitchCleanup,
-  planModuleSwitchPanelReset
+  planModuleSwitchPanelReset,
+  buildModuleActiveIndexPatch,
+  buildModuleUiMetaStatePatch,
+  uncheckLayerListOptions
 };

@@ -97,6 +97,170 @@ export function normalizeBrowseStoreCode(code) {
   return s;
 }
 
+/** 是否处于右侧表格钻取详情 */
+export function isInTableDetailView(flags) {
+  const f = flags || {};
+  return !!(f.isByDetailsChart || f.isSkDetailsChart || f.isJsDetailsChart);
+}
+
+/**
+ * 短临/实况排行项：补齐 xzqdm 为钻取码
+ */
+export function normalizeOpenDetailsDrillItem(item, disasterTypeIndex) {
+  if (disasterTypeIndex === 1 || disasterTypeIndex === 2) {
+    return Object.assign({}, item, {
+      xzqdm: getRainfallDrillCode(item) || (item && item.xzqdm)
+    });
+  }
+  return item;
+}
+
+/**
+ * 进入详情时的 UI 状态 patch（图表标志位互斥）
+ */
+export function buildOpenDetailsChartStatePatch(drillItem, disasterTypeIndex) {
+  const patch = {
+    floodCrossDrillNoData: false,
+    detailsTitleXzqh: (drillItem && drillItem.name) || "",
+    tableDirllObj: drillItem,
+    isInitTableChart: false,
+    isByDetailsChart: false,
+    isSkDetailsChart: false,
+    isJsDetailsChart: false
+  };
+  if (disasterTypeIndex === 1) {
+    patch.isByDetailsChart = true;
+  } else if (disasterTypeIndex === 2) {
+    patch.isSkDetailsChart = true;
+  } else if (disasterTypeIndex === 3 || disasterTypeIndex === 4) {
+    patch.isJsDetailsChart = true;
+  }
+  return patch;
+}
+
+/**
+ * 排行点击进入详情的编排计划（原 openDetailsChart）
+ * @returns {{
+ *   drillItem: object,
+ *   statePatch: object,
+ *   regionAction: 'enterDrill'|'storeDrill'|'none',
+ *   shouldSearchBoundary: boolean,
+ *   warningAction: 'rainfall'|'csnl'|'sh'|'none',
+ *   detailLoad: { action: string, item?: object, args?: Array }
+ * }}
+ */
+export function planOpenDetailsChart(item, options) {
+  const opts = options || {};
+  const idx = opts.disasterTypeIndex;
+  const drillItem = normalizeOpenDetailsDrillItem(item, idx);
+  const statePatch = buildOpenDetailsChartStatePatch(drillItem, idx);
+
+  let regionAction = "none";
+  if (idx === 1 || idx === 2) {
+    regionAction = "enterDrill";
+  } else if (idx === 3 || idx === 4) {
+    regionAction = "storeDrill";
+  }
+
+  let warningAction = "none";
+  let detailLoad = { action: "none" };
+
+  if (idx === 1) {
+    warningAction = "rainfall";
+    detailLoad = { action: "getJsDataXz", item: drillItem };
+  } else if (idx === 2) {
+    detailLoad = { action: "getSkJsDataXz", item: drillItem };
+  } else if (idx === 3) {
+    warningAction = "csnl";
+    if (opts.csnlValue == 1) {
+      if (opts.isMapType) {
+        // 保留原两参调用：getShTimeData(csnlValue, item.xzqdm)
+        detailLoad = {
+          action: "getShTimeData",
+          args: [opts.csnlValue, item && item.xzqdm]
+        };
+      } else {
+        detailLoad = { action: "getJssdDataXz", item: item };
+      }
+    } else {
+      detailLoad = { action: "getJSsdXzMes", item: item };
+    }
+  } else if (idx === 4) {
+    warningAction = "sh";
+    if (opts.shValue == 1) {
+      if (opts.isMapType) {
+        detailLoad = {
+          action: "getShTimeData",
+          args: [opts.shValue, opts.shValue, item && item.xzqdm]
+        };
+      } else {
+        detailLoad = { action: "getShJssdDataXz", item: item };
+      }
+    } else {
+      detailLoad = { action: "getShJsGQXZ", item: item };
+    }
+  }
+
+  return {
+    drillItem: drillItem,
+    statePatch: statePatch,
+    regionAction: regionAction,
+    shouldSearchBoundary: true,
+    warningAction: warningAction,
+    detailLoad: detailLoad
+  };
+}
+
+/**
+ * 跨模块钻取无排行数据时的页面复位 patch
+ */
+export function buildCrossModuleFloodNoDataPatch() {
+  return {
+    floodCrossDrillNoData: true,
+    jssdRainRankList: [],
+    sHjssdRainRankList: [],
+    scrollTopList: [],
+    timeData: [],
+    isInitTableChart: true,
+    isJsDetailsChart: false,
+    isByDetailsChart: false,
+    isSkDetailsChart: false,
+    detailsTitleXzqh: "",
+    tableDirllObj: {}
+  };
+}
+
+/**
+ * 无数据时是否写入浏览态行政区
+ * @returns {{ action: 'noop'|'applyBrowse', code?: string, label?: string, warningCode?: string }}
+ */
+export function planCrossModuleFloodNoDataRegion(pending, resolveDrillRegionFn) {
+  if (!pending || !pending.xzqdm) {
+    return { action: "noop" };
+  }
+  const resolve =
+    typeof resolveDrillRegionFn === "function" ? resolveDrillRegionFn : null;
+  const drill = resolve
+    ? resolve({
+        xzqdm: pending.xzqdm,
+        xiandm: pending.xzqdm,
+        name: pending.name
+      })
+    : {
+        code: String(pending.xzqdm),
+        label: pending.name || "",
+        warningCode: ""
+      };
+  const code = drill.code || String(pending.xzqdm);
+  const label = pending.name || drill.label || "";
+  return {
+    action: "applyBrowse",
+    code: code,
+    label: label,
+    warningCode: drill.warningCode || code
+  };
+}
+
 export { getQueryCode, REGION_MODE };
 
 export default {
@@ -104,5 +268,11 @@ export default {
   buildEnterDrillPartial,
   buildExitDrillPartial,
   normalizeButtonRegionCode,
-  normalizeBrowseStoreCode
+  normalizeBrowseStoreCode,
+  isInTableDetailView,
+  normalizeOpenDetailsDrillItem,
+  buildOpenDetailsChartStatePatch,
+  planOpenDetailsChart,
+  buildCrossModuleFloodNoDataPatch,
+  planCrossModuleFloodNoDataRegion
 };

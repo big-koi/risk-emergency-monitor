@@ -56,10 +56,54 @@ export function pickWarningSectionsNeedingAddress(warningInfo) {
   });
 }
 
+/**
+ * 点查回显：直接弹窗 vs 天图逆地理
+ * @returns {{ action: 'direct'|'geocode', identifyModel?, position?, lon?, lat?, jyl? }}
+ */
+export function planSearchBackwardIdentify(type, item) {
+  if (["qxyj", "byyj"].indexOf(type) !== -1) {
+    return {
+      action: "direct",
+      identifyModel: item,
+      position: [item.lon, item.lat]
+    };
+  }
+  return {
+    action: "geocode",
+    lon: item.lon,
+    lat: item.lat,
+    jyl: item.jyl || item.max,
+    geocodeUrl: buildTiandituGeocodeUrl(item.lon, item.lat)
+  };
+}
+
+/**
+ * 天图逆地理成功后的 identify 状态
+ */
+export function planGeocodeIdentifyApply(res, jyl) {
+  if (!res || !res.result || !res.result.addressComponent) {
+    return { ok: false };
+  }
+  const ac = Object.assign({}, res.result.addressComponent);
+  ac.jyl = jyl;
+  return {
+    ok: true,
+    identifyModel: ac,
+    identifyModellat: res.result.location && res.result.location.lat,
+    identifyModellon: res.result.location && res.result.location.lon,
+    position: [
+      res.result.location && res.result.location.lon,
+      res.result.location && res.result.location.lat
+    ]
+  };
+}
+
 export default {
   TIANDITU_GEOCODE_TK,
   buildTiandituGeocodeUrl,
   parseTiandituAddress,
   parseTiandituGeocodeResult,
-  pickWarningSectionsNeedingAddress
+  pickWarningSectionsNeedingAddress,
+  planSearchBackwardIdentify,
+  planGeocodeIdentifyApply
 };

@@ -6,13 +6,19 @@ export {
   resolveActiveWarningQueryCode,
   buildWarningQueryBundle,
   buildWarningDisplayOpts,
-  resolveWarningApiPayload
+  resolveWarningApiPayload,
+  resolveModuleWarningFetchKind,
+  planWarningInfoFetchStart,
+  planWarningInfoFetchSuccess,
+  planWarningInfoFetchCatch
 } from "./queryOrchestration";
 
 export {
   resolveWarningLevelConfig,
   prepareWarningCityDisplay,
   buildFloodWarningMarkerJobs,
+  applyWarningCityIconPatches,
+  planProcessWarningCityData,
   prepareRainstormWarningDisplay,
   buildQxtYjMarkerJobs
 } from "./warningCityMarkers";
@@ -22,10 +28,14 @@ export {
   buildTiandituGeocodeUrl,
   parseTiandituAddress,
   parseTiandituGeocodeResult,
-  pickWarningSectionsNeedingAddress
+  pickWarningSectionsNeedingAddress,
+  planSearchBackwardIdentify,
+  planGeocodeIdentifyApply
 } from "./tiandituGeocode";
 
 export {
   resolveWarningRegionParts,
   resolveWarningRegionLabel
 } from "./regionDisplay";
+
+export { adjustForecastTime } from "./forecastText";

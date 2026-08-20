@@ -66,6 +66,60 @@ export function shouldShowFloodTimelineTabs(options) {
   return false;
 }
 
+/** 时间轴组件延迟初始化毫秒数（与原 initTimeLine 一致） */
+export const TIMELINE_INIT_DELAY_MS = 500;
+
+/**
+ * 延迟调用时间轴 init（页面注入 runInit，通常读 $refs.timeAxis）
+ * @returns {number} timer id
+ */
+export function scheduleTimeAxisInit(runInit, delayMs) {
+  const delay = delayMs != null ? delayMs : TIMELINE_INIT_DELAY_MS;
+  return setTimeout(function() {
+    if (typeof runInit === "function") {
+      runInit();
+    }
+  }, delay);
+}
+
+/**
+ * 将接口响应规整为时间轴数据 patch
+ * @param {*} res
+ * @param {{ skipOnFail?: boolean }} [options] skipOnFail=true 时失败不改 timeData
+ */
+export function planTimelineApply(res, options) {
+  const opts = options || {};
+  const ok = !!(res && (res.code === 200 || res.code === "200"));
+  if (!ok) {
+    if (opts.skipOnFail) {
+      return {
+        ok: false,
+        skipped: true,
+        timeData: null,
+        shouldPreloadDrill: false,
+        shouldPreloadShortTerm: false
+      };
+    }
+    return {
+      ok: false,
+      skipped: false,
+      timeData: [],
+      shouldPreloadDrill: false,
+      shouldPreloadShortTerm: false
+    };
+  }
+
+  const timeData = res.data != null ? res.data : [];
+  const hasRows = Array.isArray(timeData) && timeData.length > 0;
+  return {
+    ok: true,
+    skipped: false,
+    timeData: timeData,
+    shouldPreloadDrill: !!opts.isJsDetailsChart && hasRows,
+    shouldPreloadShortTerm: !!opts.preloadShortTerm
+  };
+}
+
 export default {
   SHORT_TERM_RESOLUTION,
   FLOOD_TIMELINE_MODE,
@@ -74,5 +128,8 @@ export default {
   pickShortTermTimelineFetcher,
   resolveFloodTimelineDataType,
   shouldShowShortTermResolutionTabs,
-  shouldShowFloodTimelineTabs
+  shouldShowFloodTimelineTabs,
+  TIMELINE_INIT_DELAY_MS,
+  scheduleTimeAxisInit,
+  planTimelineApply
 };

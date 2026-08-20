@@ -1,50 +1,51 @@
 # 重构进度记录
 
 > 对照文档：`FRONTEND_REFACTOR_PLAN.md`  
-> 更新日期：2026-07-17（第 29 批）
+> 更新日期：2026-07-20（第 52 批）
 
-## 本批交付（第 29 批 · 可见效果）
+## 本批交付（第 52 批 · 可见效果）
 
-`getTaskList` 空列表处理、UI 勾选复位、后续加载动作展开抽到 `modules/taskSession/taskLoad`；灾种切换图层清理计划抽到 `moduleSwitch.planModuleSwitchCleanup`。页面 `applyPostTaskLoadPlan` 改为按 `actions` 序列执行。
+残留薄方法 / computed 抽入 `pageShellMixin`；工具栏展示码优先 `Store.queryCode`（Region Store 读源收口起步）；`removeLayersExceptResourceMenu` 与钻取图层 purge 经 `removeHostLayerViaFacade`，去掉页面/ mixin 内直接 `me.earth.removeLayer`。`index.vue` 约 **1008** 行。
 
 ### 如何验收（刷新 http://localhost:8100）
 
-1. 左下角提示：`任务列表后续加载已抽模块；见第 29 批`
-2. 切换短临/实况/内涝/山洪：任务时间、排行、预警、图层清理正常
-3. 空任务列表时时间轴清空；跨模块 pending 无数据态仍触发
-4. 打开任务列表切换历史时间后，各模块数据按计划刷新
-5. 图例勾选在刷新任务后复位为默认勾选
+1. 左下角提示：`页面壳/Facade 清层与 Store 读源起步；见第 52 批`
+2. 切换灾种 / 选行政区：工具栏展示名正常
+3. 任务列表点击、实况降雨时长切换正常
+4. 内涝/山洪钻取详情：时段 Tab 切换清层再加载正常
+5. 资源菜单保留图层：清除其它操作层后资源菜单层仍在
 
 ### 进度表
 
 | 计划阶段 | 状态 | 说明 |
 |---------|------|------|
-| 阶段 8 灾种模块 | **推进** | taskLoad + cleanup |
-| 阶段 7 UI | 延续 | — |
+| PRECHECK index 行数 <3000 | **达成** | 约 1008 行 |
+| Region Store 读源 | **起步** | 工具栏 / getStoreQueryCode 优先 Store，context 仍双轨兜底 |
+| MapFacade 散点 | **推进** | 操作层清除 / 钻取 purge 经 Facade |
 
 ### 关键改动
 
 ```text
-src/views/rapidAnalysis/modules/taskSession/taskLoad.js
-src/views/rapidAnalysis/modules/taskSession/moduleSwitch.js
-src/views/rapidAnalysis/modules/taskSession/index.js
+src/views/rapidAnalysis/mixins/pageShellMixin.js
+src/views/rapidAnalysis/mixins/mapFacadeMixin.js
+src/views/rapidAnalysis/mixins/timelineOpsMixin.js
+src/views/rapidAnalysis/mixins/regionNavigateMixin.js
 src/views/rapidAnalysis/index.vue
 src/components/rapidAnalysis/RegionStatusPanel.vue
 ```
 
 ### 本批不做
 
-- `planModuleSwitchPanelReset` 已导出但未接线（面板复位仍内联）
-- `regionContext` 与 Store 未合并
+- 未删除 `regionContext`（写路径仍双轨）
 - 主地图未切 OpenLayers
 
 ## 下一批建议
 
-1. 接线 `planModuleSwitchPanelReset`，继续压缩 `tabDisasterType`。
-2. 对照 PRECHECK 压缩 `index.vue`。
-3. 评估以 Region Store 为唯一读源。
+1. 继续把查询 / 预警 / 边界刷新读码统一走 `getStoreQueryCode`，写路径逐步只写 Store 再投影到 context。
+2. 合并过细 mixin；清理 `warningLocateMixin` 等处的 diitgis 回退路径文档化。
+3. 对照 `VITE_VUE3_PRECHECK` 剩余项。
 
 ## 回滚
 
-1. 将 `getTaskList` / `applyPostTaskLoadPlan` 改回内联。
-2. 删除 `taskLoad.js`，还原 cleanup 内联。
+1. 还原 `index.vue` 内联 computed/methods。
+2. 移除 `pageShellMixin`；恢复 `me.earth.removeLayer` 调用点。

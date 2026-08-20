@@ -10,6 +10,7 @@ export {
   buildPrintStarPrep,
   buildStarCasePrep,
   buildOpenSelectCasePatch,
+  planStarCollectFollowUp,
   resolveCollectYjlx,
   buildSingleCollectPointParams,
   buildSingleCollectDataParams,

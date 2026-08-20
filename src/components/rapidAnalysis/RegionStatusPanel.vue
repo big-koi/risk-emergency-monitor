@@ -49,7 +49,7 @@
         </button>
       </div>
       <div class="region-status-tip">
-        任务列表后续加载已抽模块；见第 29 批
+        页面壳/Facade 清层与 Store 读源起步；见第 52 批
       </div>
     </div>
   </div>
